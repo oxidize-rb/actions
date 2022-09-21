@@ -62,10 +62,7 @@ runs:
     - name: Fix clang dep for rust-bindgen (see https://github.com/rubygems/rubygems/pull/5175#discussion_r794873977)
       if: runner.os == 'Windows'
       shell: bash
-      run: |
-        if [[ -z "${MINGW_PACKAGE_PREFIX}" ]]; then
-          pacman --sync --noconfirm --needed $MINGW_PACKAGE_PREFIX-clang
-        fi
+      run: pacman --sync --noconfirm --needed $MINGW_PACKAGE_PREFIX-clang || echo "Could not install clang"
 
     - uses: dtolnay/rust-toolchain@master
       with:
