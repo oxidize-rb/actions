@@ -1,0 +1,79 @@
+---
+name: "Setup Ruby and Rust"
+description: "Download a prebuilt Ruby and add it to the PATH in 5 seconds"
+author: "Ian Ker-Seymer"
+branding:
+  icon: "download"
+  color: "gray-dark"
+inputs:
+  ruby-version:
+    description: "Engine and version to use, see the syntax in the README. Reads from .ruby-version or .tool-versions if unset."
+    default: "default"
+  rubygems:
+    description: |
+      The version of RubyGems to use. Either 'default' (the default), 'latest', or a version number (e.g., 3.3.5).
+      For 'default', no action is taken and the version of RubyGems that comes with Ruby by default is used.
+      For 'latest', `gem update --system` is run to update to the latest RubyGems version.
+      Similarly, if a version number is given, `gem update --system <version>` is run to update to that version of RubyGems, as long as that version is newer than the one provided by default.
+  bundler:
+    description: |
+      The version of Bundler to install. Either 'Gemfile.lock' (the default), 'default', 'latest', 'none', or a version number (e.g., 1, 2, 2.1, 2.1.4).
+      For 'Gemfile.lock', the version of the BUNDLED WITH section from the Gemfile.lock if it exists. If the file or section does not exist then the same as 'default'.
+      For 'default', if the Ruby ships with Bundler 2.2+ as a default gem, that version is used, otherwise the same as 'latest'.
+      For 'latest', the latest compatible Bundler version is installed (Bundler 2 on Ruby >= 2.3, Bundler 1 on Ruby < 2.3).
+      For 'none', nothing is done.
+  bundler-cache:
+    description: 'Run "bundle install", and cache the result automatically. Either true or false.'
+    default: "false"
+  working-directory:
+    description: "The working directory to use for resolving paths for .ruby-version, .tool-versions and Gemfile.lock."
+  cache-version:
+    default: "v0"
+    description: |
+      Arbitrary string that will be added to the cache key of the bundler cache. Set or change it if you need
+      to invalidate the cache.
+  rustup-toolchain:
+    description: |
+      Rustup toolchain specifier e.g. stable, nightly, 1.42.0, nightly-2022-01-01.
+    default: stable
+  rustup-targets:
+    description: |
+      Comma-separated string of additional targets to install e.g. wasm32-unknown-unknown
+    default: ""
+  rustup-components:
+    description: |
+      Comma-separated string of additional components to install e.g. clippy, rustfmt
+    default: clippy, rustfmt
+outputs:
+  ruby-prefix:
+    description: "The prefix of the installed ruby"
+runs:
+  using: "composite"
+  steps:
+    - use: "ruby/setup-ruby@v1"
+      with:
+        ruby-version: ${{ inputs.ruby-version }}
+        rubygems: ${{ inputs.rubygems }}
+        bundler: ${{ inputs.bundler }}
+        bundler-cache: ${{ inputs.bundler-cache }}
+        working-directory: ${{ inputs.working-directory }}
+        cache-version: ${{ inputs.cache-version }}
+
+    - name: Fix clang dep for rust-bindgen (see https://github.com/rubygems/rubygems/pull/5175#discussion_r794873977)
+      if: runner.os == 'Windows'
+      shell: bash
+      run: |
+        if [[ -z "${MINGW_PACKAGE_PREFIX}" ]]; then
+          pacman --sync --noconfirm --needed $MINGW_PACKAGE_PREFIX-clang
+        fi
+
+    - uses: dtolnay/rust-toolchain@master
+      with:
+        toolchain: ${{ inputs.rustup-toolchain }}
+        targets: ${{ inputs.rustup-targets }}
+        components: ${{ inputs.rustup-components }}
+
+    - uses: Swatinem/rust-cache@v2
+      if: inputs.rust-cache == true
+      with:
+        shared-key: ${{ inputs.cache-version }}
