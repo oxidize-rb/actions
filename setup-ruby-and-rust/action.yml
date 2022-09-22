@@ -70,6 +70,20 @@ runs:
         targets: ${{ inputs.rustup-targets }}
         components: ${{ inputs.rustup-components }}
 
+    - uses: dtolnay/rust-toolchain@master
+      if: runner.os != 'Windows'
+      with:
+        toolchain: ${{ inputs.rustup-toolchain }}
+        targets: ${{ inputs.rustup-targets }}
+        components: ${{ inputs.rustup-components }}
+
+    - uses: dtolnay/rust-toolchain@master
+      if: runner.os == 'Windows'
+      with:
+        toolchain: ${{ inputs.rustup-toolchain }}-x86_64-pc-windows-gnu
+        targets: ${{ inputs.rustup-targets }}
+        components: ${{ inputs.rustup-components }}
+
     - uses: Swatinem/rust-cache@v2
       if: inputs.rust-cache == true
       with:
