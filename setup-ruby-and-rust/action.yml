@@ -47,6 +47,9 @@ inputs:
   cargo-cache:
     description: "Automatically cache the target dir and Cargo registry index"
     default: "false"
+  cargo-vendor:
+    description: "Vendor cargo dependencies to avoid repeated downloads"
+    default: "false"
 outputs:
   ruby-prefix:
     description: "The prefix of the installed ruby"
@@ -107,3 +110,8 @@ runs:
       if: runner.os == 'Windows'
       shell: bash
       run: pacman --sync --noconfirm --needed $MINGW_PACKAGE_PREFIX-clang || true
+
+    - name: Vendoring cargo dependencies
+      if: inputs.cargo-vendor == 'true'
+      shell: bash
+      run: mkdir .cargo tmp && cargo vendor "$PWD/tmp/cargo-vendor" >> .cargo/config.toml
