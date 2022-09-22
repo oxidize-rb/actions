@@ -78,7 +78,7 @@ runs:
 
     - name: Setup gem compilation cache
       uses: actions/cache@v3
-      if: inputs.cargo-cache == true && runner.os != 'Windows'
+      if: inputs.cargo-cache == 'true' && runner.os != 'Windows'
       with:
         path: tmp/
         key: compilation-cache-${{ inputs.cache-version }}-${{ runner.os }}-${{ steps.rust-toolchain.outputs.cacheKey }}-${{ inputs.ruby-version }}-${{ hashFiles('**/Cargo.lock', '**/extconf.rb', '**/Gemfile.lock') }}
@@ -93,12 +93,12 @@ runs:
 
     - name: Setup gem compilation cache
       uses: actions/cache@v3
-      if: inputs.cargo-cache == true && runner.os == 'Windows'
+      if: inputs.cargo-cache == 'true' && runner.os == 'Windows'
       with:
         path: tmp/
         key: compilation-cache-${{ inputs.cache-version }}-${{ runner.os }}-${{ steps.rust-toolchain-windows.outputs.cacheKey }}-${{ inputs.ruby-version }}-${{ hashFiles('**/Cargo.lock', '**/extconf.rb', '**/Gemfile.lock') }}
 
     - uses: Swatinem/rust-cache@v2
-      if: inputs.cargo-cache == true
+      if: inputs.cargo-cache == 'true'
       with:
         shared-key: ${{ inputs.cache-version }}
