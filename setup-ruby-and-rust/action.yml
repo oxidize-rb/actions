@@ -44,6 +44,9 @@ inputs:
     description: |
       Comma-separated string of additional components to install e.g. clippy, rustfmt
     default: clippy, rustfmt
+  cargo-cache:
+    description: "Automatically cache the target dir and Cargo registry index"
+    default: "false"
 outputs:
   ruby-prefix:
     description: "The prefix of the installed ruby"
@@ -58,11 +61,6 @@ runs:
         bundler-cache: ${{ inputs.bundler-cache }}
         working-directory: ${{ inputs.working-directory }}
         cache-version: ${{ inputs.cache-version }}
-
-    - name: Fix clang dep for rust-bindgen (see https://github.com/rubygems/rubygems/pull/5175#discussion_r794873977)
-      if: runner.os == 'Windows'
-      shell: bash
-      run: pacman --sync --noconfirm --needed $MINGW_PACKAGE_PREFIX-clang || echo "Could not install clang"
 
     - uses: dtolnay/rust-toolchain@master
       with:
@@ -85,6 +83,6 @@ runs:
         components: ${{ inputs.rustup-components }}
 
     - uses: Swatinem/rust-cache@v2
-      if: inputs.rust-cache == true
+      if: inputs.cargo-cache == true
       with:
         shared-key: ${{ inputs.cache-version }}
