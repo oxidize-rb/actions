@@ -81,7 +81,7 @@ runs:
       if: inputs.cargo-cache == 'true' && runner.os != 'Windows'
       with:
         path: tmp/
-        key: compilation-cache-${{ inputs.cache-version }}-${{ runner.os }}-${{ steps.rust-toolchain.outputs.cacheKey }}-${{ inputs.ruby-version }}-${{ hashFiles('**/Cargo.lock', '**/extconf.rb', '**/Gemfile.lock') }}
+        key: compilation-cache-${{ inputs.cache-version }}-${{ runner.os }}-${{ steps.rust-toolchain.outputs.cachekey }}-${{ inputs.ruby-version }}-${{ hashFiles('**/Cargo.lock', '**/extconf.rb', '**/Gemfile.lock') }}
 
     - uses: dtolnay/rust-toolchain@master
       id: rust-toolchain-windows
@@ -96,9 +96,14 @@ runs:
       if: inputs.cargo-cache == 'true' && runner.os == 'Windows'
       with:
         path: tmp/
-        key: compilation-cache-${{ inputs.cache-version }}-${{ runner.os }}-${{ steps.rust-toolchain-windows.outputs.cacheKey }}-${{ inputs.ruby-version }}-${{ hashFiles('**/Cargo.lock', '**/extconf.rb', '**/Gemfile.lock') }}
+        key: compilation-cache-${{ inputs.cache-version }}-${{ runner.os }}-${{ steps.rust-toolchain-windows.outputs.cachekey }}-${{ inputs.ruby-version }}-${{ hashFiles('**/Cargo.lock', '**/extconf.rb', '**/Gemfile.lock') }}
 
     - uses: Swatinem/rust-cache@v2
       if: inputs.cargo-cache == 'true'
       with:
         shared-key: ${{ inputs.cache-version }}
+
+    - name: Fix clang dep for rust-bindgen
+      if: runner.os == 'Windows'
+      shell: bash
+      run: pacman --sync --noconfirm --needed $MINGW_PACKAGE_PREFIX-clang || true
