@@ -114,4 +114,4 @@ runs:
     - name: Vendoring cargo dependencies
       if: inputs.cargo-vendor == 'true'
       shell: bash
-      run: mkdir .cargo tmp && cargo vendor "$PWD/tmp/cargo-vendor" >> .cargo/config.toml
+      run: mkdir -p .cargo tmp && cargo vendor "$PWD/tmp/cargo-vendor" >> .cargo/config.toml
