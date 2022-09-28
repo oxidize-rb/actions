@@ -111,6 +111,11 @@ runs:
       shell: bash
       run: pacman --sync --noconfirm --needed $MINGW_PACKAGE_PREFIX-clang || true
 
+    - name: Set LIBCLANG_PATH
+      run: echo "LIBCLANG_PATH=$((gcm clang).source -replace "clang.exe")" >> $env:GITHUB_ENV
+      if: runner.os == 'Windows'
+      shell: pwsh
+
     - name: Vendoring cargo dependencies
       if: inputs.cargo-vendor == 'true'
       shell: bash
