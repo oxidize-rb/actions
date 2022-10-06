@@ -101,7 +101,7 @@ runs:
     - uses: Swatinem/rust-cache@v2
       if: inputs.cargo-cache == 'true'
       with:
-        shared-key: ${{ inputs.cache-version }}
+        shared-key: ${{ inputs.cache-version }}-${{ inputs.ruby-version }}
 
     - name: Fix clang dep for rust-bindgen
       if: runner.os == 'Windows'
