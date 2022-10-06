@@ -114,11 +114,16 @@ runs:
       shell: pwsh
 
     - name: Fix LD_LIBRARY_PATH for Ruby
-      run: |
-        libdir="$(ruby -rrbconfig -e 'print RbConfig::CONFIG["libdir"]')"
-        echo "LD_LIBRARY_PATH="$libdir:$LD_LIBRARY_PATH"" >> $GITHUB_ENV
       if: runner.os == 'Linux'
       shell: bash
+      run: |
+        libdir="$(ruby -rrbconfig -e 'print RbConfig::CONFIG["libdir"]')"
+
+        if [ -z "${DEPLOY_ENV}" ]; then
+          echo "LD_LIBRARY_PATH=$libdir:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+        else
+          echo "LD_LIBRARY_PATH=$libdir" >> $GITHUB_ENV
+        fi
 
     - name: Vendoring cargo dependencies
       if: inputs.cargo-vendor == 'true'
