@@ -47,6 +47,9 @@ inputs:
   cargo-cache:
     description: "Automatically cache the target dir and Cargo registry index"
     default: "false"
+  cargo-cache-extra-path:
+    description: "Paths to cache for cargo and gem compilation"
+    default: tmp/
   cargo-vendor:
     description: "Vendor cargo dependencies to avoid repeated downloads"
     default: "false"
@@ -66,12 +69,6 @@ runs:
         cache-version: ${{ inputs.cache-version }}
 
     - uses: dtolnay/rust-toolchain@master
-      with:
-        toolchain: ${{ inputs.rustup-toolchain }}
-        targets: ${{ inputs.rustup-targets }}
-        components: ${{ inputs.rustup-components }}
-
-    - uses: dtolnay/rust-toolchain@master
       id: rust-toolchain
       if: runner.os != 'Windows'
       with:
@@ -83,7 +80,7 @@ runs:
       uses: actions/cache@v3
       if: inputs.cargo-cache == 'true' && runner.os != 'Windows'
       with:
-        path: tmp/
+        path: ${{ inputs.cargo-cache-extra-path }}
         key: compilation-cache-${{ inputs.cache-version }}-${{ runner.os }}-${{ steps.rust-toolchain.outputs.cachekey }}-${{ inputs.ruby-version }}-${{ hashFiles('**/Cargo.lock', '**/extconf.rb', '**/Gemfile.lock') }}
 
     - uses: dtolnay/rust-toolchain@master
@@ -98,7 +95,7 @@ runs:
       uses: actions/cache@v3
       if: inputs.cargo-cache == 'true' && runner.os == 'Windows'
       with:
-        path: tmp/
+        path: ${{ inputs.cargo-cache-extra-path }}
         key: compilation-cache-${{ inputs.cache-version }}-${{ runner.os }}-${{ steps.rust-toolchain-windows.outputs.cachekey }}-${{ inputs.ruby-version }}-${{ hashFiles('**/Cargo.lock', '**/extconf.rb', '**/Gemfile.lock') }}
 
     - uses: Swatinem/rust-cache@v2
@@ -115,6 +112,13 @@ runs:
       run: echo "LIBCLANG_PATH=$((gcm clang).source -replace "clang.exe")" >> $env:GITHUB_ENV
       if: runner.os == 'Windows'
       shell: pwsh
+
+    - name: Fix LD_LIBRARY_PATH for Ruby
+      run: |
+        libdir="$(ruby -rrbconfig -e 'print RbConfig::CONFIG["libdir"]')"
+        echo "LD_LIBRARY_PATH="$libdir:$LD_LIBRARY_PATH"" >> $GITHUB_ENV
+      if: runner.os == 'Linux'
+      shell: bash
 
     - name: Vendoring cargo dependencies
       if: inputs.cargo-vendor == 'true'
