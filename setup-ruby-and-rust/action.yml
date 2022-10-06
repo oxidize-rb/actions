@@ -76,11 +76,16 @@ runs:
         targets: ${{ inputs.rustup-targets }}
         components: ${{ inputs.rustup-components }}
 
-    - name: Setup gem compilation cache
+    - name: Setup cargo cache
       uses: actions/cache@v3
       if: inputs.cargo-cache == 'true' && runner.os != 'Windows'
       with:
-        path: ${{ inputs.cargo-cache-extra-path }}
+        path: ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+          ${{ inputs.cargo-cache-extra-path }}
         key: compilation-cache-${{ inputs.cache-version }}-${{ runner.os }}-${{ steps.rust-toolchain.outputs.cachekey }}-${{ inputs.ruby-version }}-${{ hashFiles('**/Cargo.lock', '**/extconf.rb', '**/Gemfile.lock') }}
 
     - uses: dtolnay/rust-toolchain@master
@@ -91,17 +96,17 @@ runs:
         targets: ${{ inputs.rustup-targets }}
         components: ${{ inputs.rustup-components }}
 
-    - name: Setup gem compilation cache
+    - name: Setup cargo cache
       uses: actions/cache@v3
       if: inputs.cargo-cache == 'true' && runner.os == 'Windows'
       with:
-        path: ${{ inputs.cargo-cache-extra-path }}
+        path: ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+          ${{ inputs.cargo-cache-extra-path }}
         key: compilation-cache-${{ inputs.cache-version }}-${{ runner.os }}-${{ steps.rust-toolchain-windows.outputs.cachekey }}-${{ inputs.ruby-version }}-${{ hashFiles('**/Cargo.lock', '**/extconf.rb', '**/Gemfile.lock') }}
-
-    - uses: Swatinem/rust-cache@v2
-      if: inputs.cargo-cache == 'true'
-      with:
-        shared-key: ${{ inputs.cache-version }}-${{ inputs.ruby-version }}
 
     - name: Fix clang dep for rust-bindgen
       if: runner.os == 'Windows'
