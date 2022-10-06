@@ -23,15 +23,16 @@ jobs:
       matrix:
         os: ["ubuntu-latest", "macos-latest", "windows-latest"]
         ruby: ["2.6", "2.7", "3.0", "3.1", "head"]
+        rust: ["stable", "beta"]
     steps:
       - uses: actions/checkout@v3
 
       - uses: oxidize-rb/actions/setup-ruby-and-rust@v1
         with:
           ruby-version: ${{ matrix.ruby }}
+          rustup-toolchain: ${{ matrix.rust }}
           bundler-cache: true
           cargo-cache: true
-          cache-version: v1
 
       - name: Run ruby tests
         run: bundle exec rake
