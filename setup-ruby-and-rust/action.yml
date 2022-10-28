@@ -80,7 +80,8 @@ runs:
       uses: actions/cache@v3
       if: inputs.cargo-cache == 'true' && runner.os != 'Windows'
       with:
-        path: ~/.cargo/bin/
+        path: |
+          ~/.cargo/bin/
           ~/.cargo/registry/index/
           ~/.cargo/registry/cache/
           ~/.cargo/git/db/
@@ -100,7 +101,8 @@ runs:
       uses: actions/cache@v3
       if: inputs.cargo-cache == 'true' && runner.os == 'Windows'
       with:
-        path: ~/.cargo/bin/
+        path: |
+          ~/.cargo/bin/
           ~/.cargo/registry/index/
           ~/.cargo/registry/cache/
           ~/.cargo/git/db/
@@ -124,10 +126,10 @@ runs:
       run: |
         libdir="$(ruby -rrbconfig -e 'print RbConfig::CONFIG["libdir"]')"
 
-        if [ -z "${DEPLOY_ENV}" ]; then
-          echo "LD_LIBRARY_PATH=$libdir:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+        if [ -z "${LD_LIBRARY_PATH}" ]; then
+          echo "LD_LIBRARY_PATH=\"$libdir:$LD_LIBRARY_PATH\"" >> $GITHUB_ENV
         else
-          echo "LD_LIBRARY_PATH=$libdir" >> $GITHUB_ENV
+          echo "LD_LIBRARY_PATH=\"$libdir\"" >> $GITHUB_ENV
         fi
 
     - name: Vendoring cargo dependencies
