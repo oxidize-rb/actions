@@ -87,7 +87,7 @@ runs:
           ~/.cargo/git/db/
           target/
           ${{ inputs.cargo-cache-extra-path }}
-        key: compilation-cache-${{ inputs.cache-version }}-${{ runner.os }}-${{ steps.rust-toolchain.outputs.cachekey }}-${{ inputs.ruby-version }}-${{ hashFiles('**/Cargo.lock', '**/extconf.rb', '**/Gemfile.lock') }}
+        key: compilation-cache-${{ inputs.cache-version }}-${{ runner.os }}-${{ steps.rust-toolchain-windows.outputs.cachekey }}-${{ inputs.ruby-version }}-${{ hashFiles('**/Cargo.lock', '**/Cargo.toml', '**/extconf.rb', '**/Gemfile.lock', '**/Gemfile') }}
 
     - uses: dtolnay/rust-toolchain@master
       id: rust-toolchain-windows
@@ -108,7 +108,7 @@ runs:
           ~/.cargo/git/db/
           target/
           ${{ inputs.cargo-cache-extra-path }}
-        key: compilation-cache-${{ inputs.cache-version }}-${{ runner.os }}-${{ steps.rust-toolchain-windows.outputs.cachekey }}-${{ inputs.ruby-version }}-${{ hashFiles('**/Cargo.lock', '**/extconf.rb', '**/Gemfile.lock') }}
+        key: compilation-cache-${{ inputs.cache-version }}-${{ runner.os }}-${{ steps.rust-toolchain-windows.outputs.cachekey }}-${{ inputs.ruby-version }}-${{ hashFiles('**/Cargo.lock', '**/Cargo.toml', '**/extconf.rb', '**/Gemfile.lock', '**/Gemfile') }}
 
     - name: Fix clang dep for rust-bindgen
       if: runner.os == 'Windows'
