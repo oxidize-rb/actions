@@ -127,9 +127,9 @@ runs:
         libdir="$(ruby -rrbconfig -e 'print RbConfig::CONFIG["libdir"]')"
 
         if [ ! -z "$LD_LIBRARY_PATH" ]; then
-          echo "LD_LIBRARY_PATH=\"$libdir:$LD_LIBRARY_PATH\"" >> $GITHUB_ENV
+          echo "LD_LIBRARY_PATH=$libdir:$LD_LIBRARY_PATH" >> $GITHUB_ENV
         else
-          echo "LD_LIBRARY_PATH=\"$libdir\"" >> $GITHUB_ENV
+          echo "LD_LIBRARY_PATH=$libdir" >> $GITHUB_ENV
         fi
 
     - name: Vendoring cargo dependencies
