@@ -1,0 +1,39 @@
+---
+name: test-setup-ruby-and-rust
+on:
+  - push
+  - pull_request
+jobs:
+  test:
+    name: ${{ matrix.os }} - ${{ matrix.repo.name }} - ${{ matrix.ruby }} - ${{ matrix.rust }}
+    strategy:
+      fail-fast: false
+      matrix:
+        repo:
+          - name: "oxidize-rb/oxi-test"
+            ref: main
+            run: bundle exec rake
+          - name: "matsadler/magnus"
+            ref: main
+            run: cargo test
+        os: ["ubuntu-latest", "windows-latest", "macos-latest"]
+        rust: ["stable"]
+        ruby: ["2.7", "3.0", "3.1", "head"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          repository: ${{ matrix.repo.name }}
+          ref: ${{ matrix.repo.ref }}
+      - uses: actions/checkout@v3
+        with:
+          path: ./tmp/actions
+      - uses: ./tmp/actions/setup-ruby-and-rust
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
+          cargo-cache: true
+          cache-version: v1
+          rustup-toolchain: ${{ matrix.rust }}
+      - name: Run tests for ${{ matrix.repo.name }}
+        run: ${{ matrix.repo.run }}
