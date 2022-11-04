@@ -1,13 +1,11 @@
 ---
-name: Test
-
+name: test-setup-ruby-and-rust
 on:
   - push
   - pull_request
-
 jobs:
-  setup-ruby-and-rust:
-    name: setup-ruby-and-rust (${{ matrix.os }}, ${{ matrix.repo.name }}, ${{ matrix.ruby }}, ${{ matrix.rust }})
+  test:
+    name: ${{ matrix.os }} - ${{ matrix.repo.name }} - ${{ matrix.ruby }} - ${{ matrix.rust }}
     strategy:
       fail-fast: false
       matrix:
@@ -36,6 +34,5 @@ jobs:
           bundler-cache: true
           cargo-cache: true
           rustup-toolchain: ${{ matrix.rust }}
-          prefer-ruby-static: true
       - name: Run tests for ${{ matrix.repo.name }}
         run: ${{ matrix.repo.run }}

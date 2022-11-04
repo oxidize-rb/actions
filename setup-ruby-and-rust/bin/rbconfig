@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require 'rbconfig'
+require "rbconfig"
 
 if ARGV.first
   print RbConfig::CONFIG.fetch(ARGV.first)
