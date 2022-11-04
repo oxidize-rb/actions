@@ -3,7 +3,7 @@
 A GitHub Action that sets up a Ruby environment and Rust environment for use
 testing native Rust gems.
 
-#### Example usage
+## Example usage
 
 ```yaml
 ---
@@ -22,7 +22,7 @@ jobs:
     strategy:
       matrix:
         os: ["ubuntu-latest", "macos-latest", "windows-latest"]
-        ruby: ["2.6", "2.7", "3.0", "3.1", "head"]
+        ruby: ["2.7", "3.0", "3.1", "head"]
         rust: ["stable", "beta"]
     steps:
       - uses: actions/checkout@v3
@@ -40,3 +40,24 @@ jobs:
       - name: Lint rust
         run: cargo clippy && cargo fmt --check
 ```
+
+## Inputs
+
+<!-- inputs -->
+
+| Name                       | Description                                                                                                                      | Default           |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
+| **bundler-cache**          | Run "bundle install", and cache the result automatically. Either true or false.                                                  | `false`           |
+| **cache-version**          | Arbitrary string that will be added to the cache key of the bundler cache. Set or change it if you need to invalidate the cache. | `v0`              |
+| **cargo-cache**            | Automatically cache the target dir and Cargo registry index                                                                      | `false`           |
+| **cargo-cache-extra-path** | Paths to cache for cargo and gem compilation                                                                                     | `tmp/`            |
+| **cargo-vendor**           | Vendor cargo dependencies to avoid repeated downloads                                                                            | `false`           |
+| **debug**                  | Enable verbose debugging info (includes summary of action)                                                                       | `false`           |
+| **prefer-ruby-static**     | Prefer using libruby static if it's available                                                                                    | `false`           |
+| **ruby-version**           | Engine and version to use, see the syntax in the README. Reads from .ruby-version or .tool-versions if unset.                    | `default`         |
+| **rustup-components**      | Comma-separated string of additional components to install e.g. clippy, rustfmt                                                  | `clippy, rustfmt` |
+| **rustup-targets**         | Comma-separated string of additional targets to install e.g. wasm32-unknown-unknown                                              |                   |
+| **rustup-toolchain**       | Rustup toolchain specifier e.g. stable, nightly, 1.42.0, nightly-2022-01-01.                                                     | `stable`          |
+| **working-directory**      | The working directory to use for resolving paths for .ruby-version, .tool-versions and Gemfile.lock.                             | `./`              |
+
+<!-- /inputs -->

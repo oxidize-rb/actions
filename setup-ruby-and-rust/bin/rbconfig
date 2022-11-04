@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+
+require 'rbconfig'
+
+if ARGV.first
+  print RbConfig::CONFIG.fetch(ARGV.first)
+else
+  RbConfig::CONFIG.each do |k, v|
+    puts "#{k}=#{v.inspect}"
+  end
+end

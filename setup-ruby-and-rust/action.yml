@@ -9,24 +9,12 @@ inputs:
   ruby-version:
     description: "Engine and version to use, see the syntax in the README. Reads from .ruby-version or .tool-versions if unset."
     default: "default"
-  rubygems:
-    description: |
-      The version of RubyGems to use. Either 'default' (the default), 'latest', or a version number (e.g., 3.3.5).
-      For 'default', no action is taken and the version of RubyGems that comes with Ruby by default is used.
-      For 'latest', `gem update --system` is run to update to the latest RubyGems version.
-      Similarly, if a version number is given, `gem update --system <version>` is run to update to that version of RubyGems, as long as that version is newer than the one provided by default.
-  bundler:
-    description: |
-      The version of Bundler to install. Either 'Gemfile.lock' (the default), 'default', 'latest', 'none', or a version number (e.g., 1, 2, 2.1, 2.1.4).
-      For 'Gemfile.lock', the version of the BUNDLED WITH section from the Gemfile.lock if it exists. If the file or section does not exist then the same as 'default'.
-      For 'default', if the Ruby ships with Bundler 2.2+ as a default gem, that version is used, otherwise the same as 'latest'.
-      For 'latest', the latest compatible Bundler version is installed (Bundler 2 on Ruby >= 2.3, Bundler 1 on Ruby < 2.3).
-      For 'none', nothing is done.
   bundler-cache:
     description: 'Run "bundle install", and cache the result automatically. Either true or false.'
     default: "false"
   working-directory:
     description: "The working directory to use for resolving paths for .ruby-version, .tool-versions and Gemfile.lock."
+    default: "./"
   cache-version:
     default: "v0"
     description: |
@@ -53,86 +41,135 @@ inputs:
   cargo-vendor:
     description: "Vendor cargo dependencies to avoid repeated downloads"
     default: "false"
+  debug:
+    description: "Enable verbose debugging info (includes summary of action)"
+    default: "false"
+  prefer-ruby-static:
+    description: "Prefer using libruby static if it's available"
+    default: "false"
 outputs:
   ruby-prefix:
     description: "The prefix of the installed ruby"
+    value: ${{ steps.set-outputs.outputs.ruby-prefix }}
+  ruby-arch:
+    description: "The arch of the installed ruby"
+    value: ${{ steps.set-outputs.outputs.ruby-arch }}
+  cache-key:
+    description: "Derived cache key for the current environment"
+    value: ${{ steps.set-outputs.outputs.cache-key }}
 runs:
   using: "composite"
   steps:
-    - uses: "ruby/setup-ruby@v1"
+    - uses: "ruby/setup-ruby-pkgs@v1"
       with:
         ruby-version: ${{ inputs.ruby-version }}
-        rubygems: ${{ inputs.rubygems }}
-        bundler: ${{ inputs.bundler }}
         bundler-cache: ${{ inputs.bundler-cache }}
         working-directory: ${{ inputs.working-directory }}
         cache-version: ${{ inputs.cache-version }}
+        mingw: clang
+
+    - name: Install helpers
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        echo "$GITHUB_ACTION_PATH/bin" >> $GITHUB_PATH
+
+    - name: Print rbconfig
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        echo "::group::Print rbconfig below"
+        rbconfig
+        echo "::endgroup::"
 
     - uses: dtolnay/rust-toolchain@master
       id: rust-toolchain
-      if: runner.os != 'Windows'
       with:
-        toolchain: ${{ inputs.rustup-toolchain }}
+        toolchain: ${{ (runner.os == 'Windows' && format('{0}-x86_64-pc-windows-gnu', inputs.rustup-toolchain)) || inputs.rustup-toolchain }}
         targets: ${{ inputs.rustup-targets }}
         components: ${{ inputs.rustup-components }}
 
-    - name: Setup cargo cache
-      uses: actions/cache@v3
-      if: inputs.cargo-cache == 'true' && runner.os != 'Windows'
-      with:
-        path: |
-          ~/.cargo/bin/
-          ~/.cargo/registry/index/
-          ~/.cargo/registry/cache/
-          ~/.cargo/git/db/
-          target/
-          ${{ inputs.cargo-cache-extra-path }}
-        key: compilation-cache-${{ inputs.cache-version }}-${{ runner.os }}-${{ steps.rust-toolchain-windows.outputs.cachekey }}-${{ inputs.ruby-version }}-${{ hashFiles('**/Cargo.lock', '**/Cargo.toml', '**/extconf.rb', '**/Gemfile.lock', '**/Gemfile') }}
-
-    - uses: dtolnay/rust-toolchain@master
-      id: rust-toolchain-windows
-      if: runner.os == 'Windows'
-      with:
-        toolchain: ${{ inputs.rustup-toolchain }}-x86_64-pc-windows-gnu
-        targets: ${{ inputs.rustup-targets }}
-        components: ${{ inputs.rustup-components }}
-
-    - name: Setup cargo cache
-      uses: actions/cache@v3
-      if: inputs.cargo-cache == 'true' && runner.os == 'Windows'
-      with:
-        path: |
-          ~/.cargo/bin/
-          ~/.cargo/registry/index/
-          ~/.cargo/registry/cache/
-          ~/.cargo/git/db/
-          target/
-          ${{ inputs.cargo-cache-extra-path }}
-        key: compilation-cache-${{ inputs.cache-version }}-${{ runner.os }}-${{ steps.rust-toolchain-windows.outputs.cachekey }}-${{ inputs.ruby-version }}-${{ hashFiles('**/Cargo.lock', '**/Cargo.toml', '**/extconf.rb', '**/Gemfile.lock', '**/Gemfile') }}
-
-    - name: Fix clang dep for rust-bindgen
-      if: runner.os == 'Windows'
+    - name: Set outputs
+      id: set-outputs
       shell: bash
-      run: pacman --sync --noconfirm --needed $MINGW_PACKAGE_PREFIX-clang || true
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        echo "ruby-prefix=$(rbconfig prefix)" >> $GITHUB_OUTPUT
+        echo "ruby-arch=$(rbconfig arch)" >> $GITHUB_OUTPUT
+        echo "cache-key=setup-ruby-and-ruby-${{ inputs.cache-version }}-ruby-$(rbconfig arch)-$(rbconfig ruby_version)-rust-${{ steps.rust-toolchain.outputs.cachekey }}-${{ hashFiles('**/Cargo.lock', '**/extconf.rb', '**/Gemfile.lock') }}" >> $GITHUB_OUTPUT
 
-    - name: Set LIBCLANG_PATH
-      run: echo "LIBCLANG_PATH=$((gcm clang).source -replace "clang.exe")" >> $env:GITHUB_ENV
-      if: runner.os == 'Windows'
-      shell: pwsh
+    - name: Setup cargo cache
+      uses: actions/cache@v3
+      if: inputs.cargo-cache == 'true'
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          ${{ inputs.working-directory }}target/
+          ${{ inputs.working-directory }}${{ inputs.cargo-cache-extra-path }}
+        key: ${{ steps.set-outputs.outputs.cache-key }}
+
+    # Enable when mswin is supported
+    # - name: Fixup paths
+    #   if: runner.os == 'Windows'
+    #   shell: pwsh
+    #   working-directory: ${{ inputs.working-directory }}
+    #   run: |
+    #     echo "LIBCLANG_PATH=$((gcm clang).source -replace "clang.exe")" >> $env:GITHUB_ENV
 
     - name: Fix LD_LIBRARY_PATH for Ruby
       if: runner.os == 'Linux'
       shell: bash
+      working-directory: ${{ inputs.working-directory }}
       run: |
-        libdir="$(ruby -rrbconfig -e 'print RbConfig::CONFIG["libdir"]')"
+        echo "::group::Adding Ruby libdir to LD_LIBRARY_PATH"
+        libdir="$(rbconfig libdir)"
+        echo "Ruby libdir is $libdir"
 
         if [ ! -z "$LD_LIBRARY_PATH" ]; then
+          echo "Appending to LD_LIBRARY_PATH"
           echo "LD_LIBRARY_PATH=$libdir:$LD_LIBRARY_PATH" >> $GITHUB_ENV
         else
+          echo "Setting new LD_LIBRARY_PATH"
           echo "LD_LIBRARY_PATH=$libdir" >> $GITHUB_ENV
         fi
+        echo "::endgroup::"
 
     - name: Vendoring cargo dependencies
       if: inputs.cargo-vendor == 'true'
       shell: bash
-      run: mkdir -p .cargo tmp && cargo vendor "$PWD/tmp/cargo-vendor" >> .cargo/config.toml
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        echo "::group::Vendoring cargo deps"
+        mkdir -p .cargo tmp && cargo vendor "$PWD/tmp/cargo-vendor" >> .cargo/config.toml
+        echo "::endgroup::"
+
+    - name: Configure environment
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        echo "::group::Configuring environment"
+
+        if [ "${{ inputs.debug }}" = "true" ]; then
+          echo "Setting debug mode"
+          echo "RB_SYS_DEBUG_BUILD=1" >> $GITHUB_ENV
+        fi
+
+        if [ "${{ inputs.prefer-ruby-static }}" = "true" ]; then
+          echo "::group::Attempting to configure static libruby"
+          libdir="$(rbconfig libdir)"
+          libruby_a=$(rbconfig LIBRUBY_A || echo notfound)
+          if [ -f "$libdir/$libruby_a" ]; then
+            echo "Found LIBRUBY_A in libdir"
+            echo "RUBY_STATIC=1" >> $GITHUB_ENV
+          else
+            echo "Could not find $libruby_a in libdir, files were:"
+            ls $libdir
+            echo "Current LIBRUBYARG_STATIC: $(rbconfig LIBRUBYARG_STATIC || echo unknown)"
+          fi
+          echo "::endgroup::"
+        fi
+
+        echo "::endgroup::"
