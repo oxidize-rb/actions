@@ -14,7 +14,6 @@ inputs:
     default: "false"
   working-directory:
     description: "The working directory to use for resolving paths for .ruby-version, .tool-versions and Gemfile.lock."
-    default: ""
   cache-version:
     default: "v0"
     description: |
@@ -37,7 +36,6 @@ inputs:
     default: "false"
   cargo-cache-extra-path:
     description: "Paths to cache for cargo and gem compilation"
-    default: tmp/
   cargo-vendor:
     description: "Vendor cargo dependencies to avoid repeated downloads"
     default: "false"
@@ -70,13 +68,11 @@ runs:
 
     - name: Install helpers
       shell: bash
-      working-directory: ${{ inputs.working-directory }}
       run: |
         echo "$GITHUB_ACTION_PATH/bin" >> $GITHUB_PATH
 
     - name: Print rbconfig
       shell: bash
-      working-directory: ${{ inputs.working-directory }}
       run: |
         echo "::group::Print rbconfig below"
         rbconfig
@@ -92,7 +88,6 @@ runs:
     - name: Set outputs
       id: set-outputs
       shell: bash
-      working-directory: ${{ inputs.working-directory }}
       run: |
         echo "ruby-prefix=$(rbconfig prefix)" >> $GITHUB_OUTPUT
         echo "ruby-arch=$(rbconfig arch)" >> $GITHUB_OUTPUT
@@ -107,8 +102,9 @@ runs:
           ~/.cargo/registry/index/
           ~/.cargo/registry/cache/
           ~/.cargo/git/db/
-          ${{ inputs.working-directory }}target/
-          ${{ inputs.working-directory }}${{ inputs.cargo-cache-extra-path }}
+          **/target/
+          **/tmp/${{ steps.set-outputs.outputs.ruby-arch }}/
+          ${{ inputs.cargo-cache-extra-path }}
         key: ${{ steps.set-outputs.outputs.cache-key }}
 
     # Enable when mswin is supported
@@ -122,7 +118,6 @@ runs:
     - name: Fix LD_LIBRARY_PATH for Ruby
       if: runner.os == 'Linux'
       shell: bash
-      working-directory: ${{ inputs.working-directory }}
       run: |
         echo "::group::Adding Ruby libdir to LD_LIBRARY_PATH"
         libdir="$(rbconfig libdir)"
@@ -140,15 +135,15 @@ runs:
     - name: Vendoring cargo dependencies
       if: inputs.cargo-vendor == 'true'
       shell: bash
-      working-directory: ${{ inputs.working-directory }}
       run: |
         echo "::group::Vendoring cargo deps"
+        [ "${{ inputs.working-directory }}" != "" ] && pushd "${{ inputs.working-directory }}"
         mkdir -p .cargo tmp && cargo vendor "$PWD/tmp/cargo-vendor" >> .cargo/config.toml
+        [ "${{ inputs.working-directory }}" != "" ] && popd
         echo "::endgroup::"
 
     - name: Configure environment
       shell: bash
-      working-directory: ${{ inputs.working-directory }}
       run: |
         echo "::group::Configuring environment"
 
