@@ -14,7 +14,7 @@ inputs:
     default: "false"
   working-directory:
     description: "The working directory to use for resolving paths for .ruby-version, .tool-versions and Gemfile.lock."
-    default: "./"
+    default: ""
   cache-version:
     default: "v0"
     description: |
