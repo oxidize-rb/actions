@@ -33,6 +33,7 @@ jobs:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
           cargo-cache: true
+          cache-version: v1
           rustup-toolchain: ${{ matrix.rust }}
       - name: Run tests for ${{ matrix.repo.name }}
         run: ${{ matrix.repo.run }}
