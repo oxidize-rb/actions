@@ -8,13 +8,13 @@ branding:
 inputs:
   stable-ruby-versions:
     description: "List non-EOF Ruby versions"
-    default: "false"
+    default: "true"
   supported-ruby-platforms:
     description: "List all supported cross-platforms (can exclude items with YAML argument)"
-    default: "false"
+    default: "true"
   supported-rust-targets:
     description: "List all supported Rust targets (can exclude items with YAML argument)"
-    default: "false"
+    default: "true"
 outputs:
   result:
     description: 'Result of the query (i.e. `{"stable-ruby-versions":["2.7","3.0","3.1","head"]}`)'

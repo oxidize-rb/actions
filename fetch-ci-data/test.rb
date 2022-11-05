@@ -87,9 +87,9 @@ describe "fetch-ci-data" do
   describe "all the things" do
     it "works" do
       result = run_with_input({
-        "stable-ruby-versions" => true,
-        "supported-ruby-platforms" => true,
-        "supported-rust-targets" => true
+        "stable-ruby-versions" => "true",
+        "supported-ruby-platforms" => "true",
+        "supported-rust-targets" => "true"
       })
 
       assert_equal 3, result.keys.size

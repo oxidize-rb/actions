@@ -100,9 +100,9 @@ jobs:
 
 | Name                         | Description                                                               | Default |
 | ---------------------------- | ------------------------------------------------------------------------- | ------- |
-| **stable-ruby-versions**     | List non-EOF Ruby versions                                                | `false` |
-| **supported-ruby-platforms** | List all supported cross-platforms (can exclude items with YAML argument) | `false` |
-| **supported-rust-targets**   | List all supported Rust targets (can exclude items with YAML argument)    | `false` |
+| **stable-ruby-versions**     | List non-EOF Ruby versions                                                | `true`  |
+| **supported-ruby-platforms** | List all supported cross-platforms (can exclude items with YAML argument) | `true`  |
+| **supported-rust-targets**   | List all supported Rust targets (can exclude items with YAML argument)    | `true`  |
 
 <!-- /inputs -->
 
