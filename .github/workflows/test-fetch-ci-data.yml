@@ -1,0 +1,24 @@
+---
+name: test-fetch-ci-data
+on:
+  push:
+    paths:
+      - "fetch-ci-data/**/*"
+      - ".github/workflows/test-fetch-ci-data.yml"
+    pull_request: {}
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: ./fetch-ci-data
+        id: ci-data
+        with:
+          stable-ruby-versions: true
+          supported-ruby-platforms: true
+          supported-rust-targets: true
+
+      - name: Run tests
+        run: |
+          echo ${{ toJSON(steps.ci-data.outputs.result) }} | ruby fetch-ci-data/test.rb -v
