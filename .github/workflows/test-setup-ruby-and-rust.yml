@@ -1,11 +1,14 @@
 ---
 name: test-setup-ruby-and-rust
 on:
-  - push
-  - pull_request
+  push:
+    paths:
+      - "setup-ruby-and-rust/**/*"
+      - ".github/workflows/test-setup-ruby-and-rust.yml"
+    pull_request: {}
 jobs:
   test:
-    name: ${{ matrix.os }} - ${{ matrix.repo.name }} - ${{ matrix.ruby }} - ${{ matrix.rust }}
+    name: ${{ matrix.os }} | ${{ matrix.repo.name }} - ${{ matrix.ruby }} - ${{ matrix.rust }}
     strategy:
       fail-fast: false
       matrix:

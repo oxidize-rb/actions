@@ -1,0 +1,30 @@
+---
+name: "Fetch CI Data"
+description: "Query useful CI data for usage in a matrix, etc."
+author: "Ian Ker-Seymer"
+branding:
+  icon: "download-cloud"
+  color: "gray-dark"
+inputs:
+  stable-ruby-versions:
+    description: "List non-EOF Ruby versions"
+    default: "false"
+  supported-ruby-platforms:
+    description: "List all supported cross-platforms (can exclude items with YAML argument)"
+    default: "false"
+  supported-rust-targets:
+    description: "List all supported Rust targets (can exclude items with YAML argument)"
+    default: "false"
+outputs:
+  result:
+    description: 'Result of the query (i.e. `{"stable-ruby-versions":["2.7","3.0","3.1","head"]}`)'
+    value: ${{ steps.run-query.outputs.result }}
+runs:
+  using: "composite"
+  steps:
+    - name: Run query
+      id: run-query
+      shell: bash
+      run: |
+        result="$(echo '${{ toJSON(inputs) }}' | ruby $GITHUB_ACTION_PATH/evaluate.rb)"  
+        echo "result=$result">> $GITHUB_OUTPUT
