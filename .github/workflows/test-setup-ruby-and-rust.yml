@@ -17,11 +17,27 @@ jobs:
             ref: main
             run: bundle exec rake
           - name: "matsadler/magnus"
-            ref: main
+            ref: 855cc11a73e536083e37bb89d5e101a02a748150
             run: cargo test
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
         rust: ["stable"]
         ruby: ["2.7", "3.0", "3.1", "head"]
+        include:
+          - os: "windows-latest"
+            ruby: "mswin"
+            rust: "stable"
+            repo:
+              name: "oxidize-rb/oxi-test"
+              ref: main
+              run: bundle exec rake
+          # - os: "windows-latest"
+          #   ruby: "mswin"
+          #   rust: "stable"
+          #   repo:
+          #     name: "matsadler/magnus"
+          #     ref: 855cc11a73e536083e37bb89d5e101a02a748150
+          #     run: env RUSTFLAGS="-Clink-dead-code=off" cargo test
+
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
@@ -32,11 +48,16 @@ jobs:
         with:
           path: ./tmp/actions
       - uses: ./tmp/actions/setup-ruby-and-rust
+        id: setup
         with:
           ruby-version: ${{ matrix.ruby }}
+          rustup-toolchain: ${{ matrix.rust }}
+          cache-version: v1
           bundler-cache: true
           cargo-cache: true
-          cache-version: v1
-          rustup-toolchain: ${{ matrix.rust }}
+      - name: Run unit tests
+        env:
+          SETUP_OUTPUTS: ${{ toJSON(steps.setup.outputs) }}
+        run: ruby ./tmp/actions/setup-ruby-and-rust/test.rb -v
       - name: Run tests for ${{ matrix.repo.name }}
         run: ${{ matrix.repo.run }}

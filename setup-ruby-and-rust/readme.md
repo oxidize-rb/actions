@@ -66,10 +66,10 @@ jobs:
 
 <!-- outputs -->
 
-| Name            | Description                                   |
-| --------------- | --------------------------------------------- |
-| **cache-key**   | Derived cache key for the current environment |
-| **ruby-arch**   | The arch of the installed ruby                |
-| **ruby-prefix** | The prefix of the installed ruby              |
+| Name              | Description                                   |
+| ----------------- | --------------------------------------------- |
+| **cache-key**     | Derived cache key for the current environment |
+| **ruby-platform** | The platform of the installed ruby            |
+| **ruby-prefix**   | The prefix of the installed ruby              |
 
 <!-- /outputs -->
