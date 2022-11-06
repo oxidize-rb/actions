@@ -49,9 +49,9 @@ outputs:
   ruby-prefix:
     description: "The prefix of the installed ruby"
     value: ${{ steps.set-outputs.outputs.ruby-prefix }}
-  ruby-arch:
-    description: "The arch of the installed ruby"
-    value: ${{ steps.set-outputs.outputs.ruby-arch }}
+  ruby-platform:
+    description: "The platform of the installed ruby"
+    value: ${{ steps.set-outputs.outputs.ruby-platform }}
   cache-key:
     description: "Derived cache key for the current environment"
     value: ${{ steps.set-outputs.outputs.cache-key }}
@@ -69,19 +69,29 @@ runs:
     - name: Install helpers
       shell: bash
       run: |
+        : Install helpers
         echo "$GITHUB_ACTION_PATH/bin" >> $GITHUB_PATH
 
     - name: Print rbconfig
       shell: bash
       run: |
+        : Print rbconfig
         echo "::group::Print rbconfig below"
         rbconfig
         echo "::endgroup::"
 
+    - name: Derive toolchain
+      id: derive-toolchain
+      shell: bash
+      run: |
+        : Derive toolchain
+        derived_toolchain="$(ruby --disable-gems $GITHUB_ACTION_PATH/helpers/derive_toolchain.rb ${{ inputs.rustup-toolchain }})"
+        echo "toolchain=$derived_toolchain" >> $GITHUB_OUTPUT
+
     - uses: dtolnay/rust-toolchain@master
       id: rust-toolchain
       with:
-        toolchain: ${{ (runner.os == 'Windows' && format('{0}-x86_64-pc-windows-gnu', inputs.rustup-toolchain)) || inputs.rustup-toolchain }}
+        toolchain: ${{ steps.derive-toolchain.outputs.toolchain }}
         targets: ${{ inputs.rustup-targets }}
         components: ${{ inputs.rustup-components }}
 
@@ -89,9 +99,11 @@ runs:
       id: set-outputs
       shell: bash
       run: |
+        : Set outputs
+        ruby_platform="$(rbconfig arch)"
         echo "ruby-prefix=$(rbconfig prefix)" >> $GITHUB_OUTPUT
-        echo "ruby-arch=$(rbconfig arch)" >> $GITHUB_OUTPUT
-        echo "cache-key=setup-ruby-and-ruby-${{ inputs.cache-version }}-ruby-$(rbconfig arch)-$(rbconfig ruby_version)-rust-${{ steps.rust-toolchain.outputs.cachekey }}-${{ hashFiles('**/Cargo.lock', '**/extconf.rb', '**/Gemfile.lock') }}" >> $GITHUB_OUTPUT
+        echo "ruby-platform=$ruby_platform" >> $GITHUB_OUTPUT
+        echo "cache-key=$(rbconfig ruby_version)__${ruby_platform}__${{ steps.rust-toolchain.outputs.cachekey }}__${{ hashFiles('**/Cargo.lock', '**/extconf.rb', '**/Gemfile.lock') }}__${{ inputs.cache-version }}" >> $GITHUB_OUTPUT
 
     - name: Setup cargo cache
       uses: actions/cache@v3
@@ -103,22 +115,22 @@ runs:
           ~/.cargo/registry/cache/
           ~/.cargo/git/db/
           **/target/
-          **/tmp/${{ steps.set-outputs.outputs.ruby-arch }}/
+          **/tmp/${{ steps.set-outputs.outputs.ruby-platform }}/
           ${{ inputs.cargo-cache-extra-path }}
         key: ${{ steps.set-outputs.outputs.cache-key }}
 
-    # Enable when mswin is supported
-    # - name: Fixup paths
-    #   if: runner.os == 'Windows'
+    # - name: Set LIBCLANG_PATH
+    #   if: contains('mswin', steps.set-outputs.outputs.ruby-platform)
     #   shell: pwsh
     #   working-directory: ${{ inputs.working-directory }}
     #   run: |
     #     echo "LIBCLANG_PATH=$((gcm clang).source -replace "clang.exe")" >> $env:GITHUB_ENV
 
-    - name: Fix LD_LIBRARY_PATH for Ruby
+    - name: Set LD_LIBRARY_PATH for Ruby
       if: runner.os == 'Linux'
       shell: bash
       run: |
+        : Set LD_LIBRARY_PATH for Ruby
         echo "::group::Adding Ruby libdir to LD_LIBRARY_PATH"
         libdir="$(rbconfig libdir)"
         echo "Ruby libdir is $libdir"
@@ -132,10 +144,11 @@ runs:
         fi
         echo "::endgroup::"
 
-    - name: Vendoring cargo dependencies
+    - name: Vendor cargo dependencies
       if: inputs.cargo-vendor == 'true'
       shell: bash
       run: |
+        : Vendor carogo dependencies
         echo "::group::Vendoring cargo deps"
         [ "${{ inputs.working-directory }}" != "" ] && pushd "${{ inputs.working-directory }}"
         mkdir -p .cargo tmp && cargo vendor "$PWD/tmp/cargo-vendor" >> .cargo/config.toml
@@ -145,6 +158,7 @@ runs:
     - name: Configure environment
       shell: bash
       run: |
+        : Configure environment
         echo "::group::Configuring environment"
 
         if [ "${{ inputs.debug }}" = "true" ]; then
