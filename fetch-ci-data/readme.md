@@ -20,7 +20,8 @@ jobs:
       - id: fetch
         uses: oxidize-rb/actions/fetch-ci-data@main
         with:
-          stable-ruby-versions: true
+          stable-ruby-versions: |
+            exclude: []
   test:
     name: Test on Ruby ${{ matrix.ruby }}
     needs: ci-data
