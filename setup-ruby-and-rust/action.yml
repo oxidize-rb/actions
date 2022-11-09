@@ -103,7 +103,7 @@ runs:
         ruby_platform="$(rbconfig arch)"
         echo "ruby-prefix=$(rbconfig prefix)" >> $GITHUB_OUTPUT
         echo "ruby-platform=$ruby_platform" >> $GITHUB_OUTPUT
-        echo "cache-key=$(rbconfig ruby_version)__${ruby_platform}__${{ steps.rust-toolchain.outputs.cachekey }}__${{ hashFiles('**/Cargo.lock', '**/extconf.rb', '**/Gemfile.lock') }}__${{ inputs.cache-version }}" >> $GITHUB_OUTPUT
+        echo "cache-key=$(rbconfig ruby_version)__${ruby_platform}__${{ steps.rust-toolchain.outputs.cachekey }}__${{ hashFiles('**/Cargo.lock', '**/extconf.rb', '**/Gemfile.lock', '**/Gemfile', '**/Cargo.toml', '**/.cargo/config.toml') }}__${{ inputs.cache-version }}" >> $GITHUB_OUTPUT
 
     - name: Setup cargo cache
       uses: actions/cache@v3
@@ -115,16 +115,17 @@ runs:
           ~/.cargo/registry/cache/
           ~/.cargo/git/db/
           **/target/
+          **/tmp/arm-linux
+          **/tmp/aarch64-linux
+          **/tmp/arm64-darwin
+          **/tmp/x64-mingw-ucrt
+          **/tmp/x64-mingw32
+          **/tmp/x86_64-darwin
+          **/tmp/x86_64-linux
+          **/tmp/x86_64-linux-musl
           **/tmp/${{ steps.set-outputs.outputs.ruby-platform }}/
           ${{ inputs.cargo-cache-extra-path }}
         key: ${{ steps.set-outputs.outputs.cache-key }}
-
-    # - name: Set LIBCLANG_PATH
-    #   if: contains('mswin', steps.set-outputs.outputs.ruby-platform)
-    #   shell: pwsh
-    #   working-directory: ${{ inputs.working-directory }}
-    #   run: |
-    #     echo "LIBCLANG_PATH=$((gcm clang).source -replace "clang.exe")" >> $env:GITHUB_ENV
 
     - name: Set LD_LIBRARY_PATH for Ruby
       if: runner.os == 'Linux'
