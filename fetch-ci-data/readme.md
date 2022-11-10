@@ -29,7 +29,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby: ${{ fromJSON(needs.ci-data.outputs.result.stable-ruby-versions) }}
+        ruby: ${{ fromJSON(needs.ci-data.outputs.result).stable-ruby-versions }}
     steps:
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
@@ -72,7 +72,7 @@ jobs:
     needs: ci-data
     strategy:
       matrix:
-        platform: ${{ fromJSON(needs.ci-data.outputs.result.supported-ruby-platforms) }}
+        platform: ${{ fromJSON(needs.ci-data.outputs.result).supported-ruby-platforms }}
     steps:
       - uses: actions/checkout@v2
 
