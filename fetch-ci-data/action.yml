@@ -25,7 +25,9 @@ runs:
     - name: Run query
       id: run-query
       shell: bash
+      env:
+        INPUTS: ${{ toJSON(inputs) }}
       run: |
         : Run query
-        result="$(echo '${{ toJSON(inputs) }}' | ruby $GITHUB_ACTION_PATH/evaluate.rb)"
-        echo "result=$result">> $GITHUB_OUTPUT
+        result="$(ruby $GITHUB_ACTION_PATH/evaluate.rb)"
+        echo "result=$result" >> $GITHUB_OUTPUT

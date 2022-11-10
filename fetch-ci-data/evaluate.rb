@@ -70,6 +70,6 @@ def evaluate_query(inputs)
   result
 end
 
-inputs = JSON.parse(ARGF.read)
+inputs = JSON.parse(ENV.fetch("INPUTS"))
 
 puts evaluate_query(inputs).to_json
