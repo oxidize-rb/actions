@@ -32,6 +32,7 @@ def fetch_stable_ruby_versions(inputs)
   opts = parse_yaml_opts(opts_string)
   versions = fetch_json("https://cache.ruby-lang.org/pub/misc/ci_versions/cruby.json")
   versions.reject! { |version| opts["exclude"].include?(version) } if opts["exclude"]
+  versions.select! { |version| opts["only"].include?(version) } if opts["only"]
 
   {"stable-ruby-versions" => versions}
 end
@@ -54,6 +55,7 @@ def fetch_supported(inputs, key)
   matrix = fetch_rb_sys_github_action_matrix
   plats = matrix["include"].map { |entry| entry[key] }
   plats.reject! { |plat| opts["exclude"].include?(plat) } if opts["exclude"]
+  plats.select! { |plat| opts["only"].include?(plat) } if opts["only"]
 
   {"supported-#{key}s" => plats}
 end
