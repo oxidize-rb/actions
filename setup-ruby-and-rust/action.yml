@@ -106,13 +106,12 @@ runs:
       run: |
         : Set outputs
         ruby_platform="$(rbconfig arch)"
-        rb_sys_version="$(bundle exec ruby -rrb_sys -e 'puts RbSys::VERSION' || echo '0.0.0')"
 
         echo "ruby-prefix=$(rbconfig prefix)" >> $GITHUB_OUTPUT
         echo "ruby-platform=$ruby_platform" >> $GITHUB_OUTPUT
 
         cache_level_1="${{ inputs.cache-version }}__$(rbconfig ruby_version)__${ruby_platform}__${{ steps.rust-toolchain.outputs.cachekey }}"
-        cache_level_2="${cache_level_1}__${{ hashFiles('**/extconf.rb') }}__${rb_sys_version}"
+        cache_level_2="${cache_level_1}__${{ hashFiles('**/extconf.rb') }}"
         cache_level_3="${cache_level_2}__${{ hashFiles('**/Cargo.toml', '**/Gemfile') }}"
         cache_level_4="${cache_level_3}__${{ hashFiles('**/Cargo.lock', '**/Gemfile.lock') }}"
 
