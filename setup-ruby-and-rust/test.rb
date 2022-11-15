@@ -15,7 +15,7 @@ describe "setup-ruby-and-ruby" do
     it "has has a valid cache-key" do
       parts = OUTPUTS["cache-key"].split("__")
 
-      assert_equal 5, parts.size
+      assert_equal 7, parts.size
       assert parts.all? { |part| !part.strip.empty? }
     end
 
