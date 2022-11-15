@@ -158,8 +158,8 @@ runs:
           ${{ inputs.cargo-cache-extra-path }}
         key: ${{ steps.set-outputs.outputs.cache-key }}
         restore-keys: |
-          ${{ steps.set-outputs.outputs.cache-key-level-2 }}
           ${{ steps.set-outputs.outputs.cache-key-level-3 }}
+          ${{ steps.set-outputs.outputs.cache-key-level-2 }}
 
     - name: Clean the cargo cache
       if: inputs.cargo-cache-clean == 'true'
