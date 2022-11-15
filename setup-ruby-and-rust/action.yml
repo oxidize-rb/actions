@@ -106,9 +106,23 @@ runs:
       run: |
         : Set outputs
         ruby_platform="$(rbconfig arch)"
+        rb_sys_version="$(bundle exec ruby -rrb_sys -e 'puts RbSys::VERSION' || echo '0.0.0')"
+
         echo "ruby-prefix=$(rbconfig prefix)" >> $GITHUB_OUTPUT
         echo "ruby-platform=$ruby_platform" >> $GITHUB_OUTPUT
-        echo "cache-key=$(rbconfig ruby_version)__${ruby_platform}__${{ steps.rust-toolchain.outputs.cachekey }}__${{ hashFiles('**/Cargo.lock', '**/extconf.rb', '**/Gemfile.lock') }}__${{ inputs.cache-version }}" >> $GITHUB_OUTPUT
+
+        cache_level_1="${{ inputs.cache-version }}__$(rbconfig ruby_version)__${ruby_platform}__${{ steps.rust-toolchain.outputs.cachekey }}"
+        cache_level_2="${cache_level_1}__${{ hashFiles('**/extconf.rb') }}__${rb_sys_version}"
+        cache_level_3="${cache_level_2}__${{ hashFiles('**/Cargo.toml', '**/Gemfile') }}"
+        cache_level_4="${cache_level_3}__${{ hashFiles('**/Cargo.lock', '**/Gemfile.lock') }}"
+
+        echo "cache-key-level-1=$cache_level_1" >> $GITHUB_OUTPUT
+        echo "cache-key-level-2=$cache_level_2" >> $GITHUB_OUTPUT
+        echo "cache-key-level-3=$cache_level_3" >> $GITHUB_OUTPUT
+        echo "cache-key-level-4=$cache_level_4" >> $GITHUB_OUTPUT
+
+        echo "cache-key="${cache_level_4}" >> $GITHUB_OUTPUT
+
 
     - name: Setup cargo cache
       uses: actions/cache@v3
@@ -123,13 +137,9 @@ runs:
           **/tmp/${{ steps.set-outputs.outputs.ruby-platform }}/
           ${{ inputs.cargo-cache-extra-path }}
         key: ${{ steps.set-outputs.outputs.cache-key }}
-
-    # - name: Set LIBCLANG_PATH
-    #   if: contains('mswin', steps.set-outputs.outputs.ruby-platform)
-    #   shell: pwsh
-    #   working-directory: ${{ inputs.working-directory }}
-    #   run: |
-    #     echo "LIBCLANG_PATH=$((gcm clang).source -replace "clang.exe")" >> $env:GITHUB_ENV
+        restore-keys: |
+          ${{ steps.set-outputs.outputs.cache-key-level-2 }}
+          ${{ steps.set-outputs.outputs.cache-key-level-3 }}
 
     - name: Set LD_LIBRARY_PATH for Ruby
       if: runner.os == 'Linux'
