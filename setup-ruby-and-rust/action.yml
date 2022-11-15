@@ -130,7 +130,7 @@ runs:
       if: inputs.cargo-cache-clean == 'true'
       with:
         path: ~/.setup-ruby-and-rust/bin/cargo-cache
-        key: cargo-cache-clean-0.8.3
+        key: ${{ steps.set-outputs.outputs.ruby-platform }}-cargo-cache-clean-0.8.3
 
     - name: Install cargo-cache
       id: install-cargo-cache
