@@ -120,7 +120,8 @@ runs:
         echo "cache-key-level-3=$cache_level_3" >> $GITHUB_OUTPUT
         echo "cache-key-level-4=$cache_level_4" >> $GITHUB_OUTPUT
 
-        echo "cache-key="${cache_level_4}" >> $GITHUB_OUTPUT
+        echo "cache-key=${cache_level_4}" >> $GITHUB_OUTPUT
+
 
 
     - name: Setup cargo cache
