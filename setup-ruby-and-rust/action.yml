@@ -38,6 +38,9 @@ inputs:
   cargo-cache:
     description: "Automatically cache the target dir and Cargo registry index"
     default: "false"
+  cargo-cache-clean:
+    description: "Clean the cargo cache with cargo cache --autoclean"
+    default: "false"
   cargo-cache-extra-path:
     description: "Paths to cache for cargo and gem compilation"
   cargo-vendor:
@@ -122,7 +125,24 @@ runs:
 
         echo "cache-key=${cache_level_4}" >> $GITHUB_OUTPUT
 
+    - name: Cache the "cargo-cache" executable
+      uses: actions/cache@v3
+      if: inputs.cargo-cache-clean == 'true'
+      with:
+        path: ~/.setup-ruby-and-rust/bin/cargo-cache
+        key: cargo-cache-clean-0.8.3
 
+    - name: Install cargo-cache
+      id: install-cargo-cache
+      if: inputs.cargo-cache-clean == 'true'
+      shell: bash
+      run: |
+        : Setup cargo-cache
+        if [ ! -f "$HOME/.setup-ruby-and-rust/bin/cargo-cache" ]; then
+          cargo install --features ci-autoclean cargo-cache --root "$HOME/.setup-ruby-and-rust" --version 0.8.3
+        fi
+
+        echo "$HOME/.setup-ruby-and-rust/bin" >> $GITHUB_PATH
 
     - name: Setup cargo cache
       uses: actions/cache@v3
@@ -140,6 +160,13 @@ runs:
         restore-keys: |
           ${{ steps.set-outputs.outputs.cache-key-level-2 }}
           ${{ steps.set-outputs.outputs.cache-key-level-3 }}
+
+    - name: Clean the cargo cache
+      if: inputs.cargo-cache-clean == 'true'
+      uses: oxidize-rb/actions/post-run@autoclean # TODO: update
+      with:
+        run: cargo-cache --autoclean
+        cwd: ${{ inputs.working-directory }}
 
     - name: Set LD_LIBRARY_PATH for Ruby
       if: runner.os == 'Linux'

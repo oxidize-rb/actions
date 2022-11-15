@@ -5,7 +5,6 @@ on:
     paths:
       - "setup-ruby-and-rust/**/*"
       - ".github/workflows/test-setup-ruby-and-rust.yml"
-    pull_request: {}
 jobs:
   test:
     name: ${{ matrix.os }} | ${{ matrix.repo.name }} - ${{ matrix.ruby }} - ${{ matrix.rust }}
@@ -30,13 +29,13 @@ jobs:
               name: "oxidize-rb/oxi-test"
               ref: main
               run: bundle exec rake
-          # - os: "windows-latest"
-          #   ruby: "mswin"
-          #   rust: "stable"
-          #   repo:
-          #     name: "matsadler/magnus"
-          #     ref: 855cc11a73e536083e37bb89d5e101a02a748150
-          #     run: env RUSTFLAGS="-Clink-dead-code=off" cargo test
+          - os: "windows-latest"
+            ruby: "mswin"
+            rust: "stable"
+            repo:
+              name: "matsadler/magnus"
+              ref: main
+              run: cargo test
 
     runs-on: ${{ matrix.os }}
     steps:
@@ -52,9 +51,10 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby }}
           rustup-toolchain: ${{ matrix.rust }}
-          cache-version: v1
+          cache-version: v0
           bundler-cache: true
           cargo-cache: true
+          cargo-cache-clean: true
       - name: Run unit tests
         env:
           SETUP_OUTPUTS: ${{ toJSON(steps.setup.outputs) }}
