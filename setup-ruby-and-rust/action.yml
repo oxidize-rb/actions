@@ -1,6 +1,6 @@
 ---
 name: "Setup Ruby and Rust"
-description: "Download a prebuilt Ruby and add it to the PATH in 5 seconds"
+description: "Setup Ruby and Rust for GitHub Actions"
 author: "Ian Ker-Seymer"
 branding:
   icon: "download"
@@ -224,3 +224,10 @@ runs:
         fi
 
         echo "::endgroup::"
+
+    - name: Configure bindgen
+      if: contains(steps.derive-toolchain.outputs.toolchain, 'msvc')
+      shell: pwsh
+      run: |
+        echo "LIBCLANG_PATH=$((gcm clang).source -replace "clang.exe")" >> $env:GITHUB_ENV
+        echo "BINDGEN_EXTRA_CLANG_ARGS=$((gcm clang).source -replace "bin\clang.exe","include")" >> $env:GITHUB_ENV
