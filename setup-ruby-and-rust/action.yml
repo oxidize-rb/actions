@@ -7,7 +7,7 @@ branding:
   color: "gray-dark"
 inputs:
   ruby-version:
-    description: "Engine and version to use, see the syntax in the README. Reads from .ruby-version or .tool-versions if unset."
+    description: "Engine and version to use, see the syntax in the README. Reads from .ruby-version or .tool-versions if unset. Can be set to 'none' to skip installing Ruby."
     default: "default"
   bundler-cache:
     description: 'Run "bundle install", and cache the result automatically. Either true or false.'
@@ -66,6 +66,7 @@ runs:
   using: "composite"
   steps:
     - uses: "ruby/setup-ruby-pkgs@v1"
+      if: inputs.ruby-version != 'none'
       with:
         ruby-version: ${{ inputs.ruby-version }}
         bundler-cache: ${{ inputs.bundler-cache }}
@@ -81,6 +82,7 @@ runs:
         echo "$GITHUB_ACTION_PATH/bin" >> $GITHUB_PATH
 
     - name: Print rbconfig
+      if: inputs.ruby-version != 'none'
       shell: bash
       run: |
         : Print rbconfig
@@ -169,7 +171,7 @@ runs:
         cwd: ${{ inputs.working-directory }}
 
     - name: Set LD_LIBRARY_PATH for Ruby
-      if: runner.os == 'Linux'
+      if: runner.os == 'Linux' && inputs.ruby-version != 'none'
       shell: bash
       run: |
         : Set LD_LIBRARY_PATH for Ruby
