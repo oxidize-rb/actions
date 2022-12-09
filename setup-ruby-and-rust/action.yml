@@ -38,6 +38,9 @@ inputs:
   cargo-cache:
     description: "Automatically cache the target dir and Cargo registry index"
     default: "false"
+  sccache:
+    description: "Use sccache for faster compilation"
+    default: "false"
   cargo-cache-clean:
     description: "Clean the cargo cache with cargo cache --autoclean"
     default: "false"
@@ -129,14 +132,14 @@ runs:
 
     - name: Cache the "cargo-cache" executable
       uses: actions/cache@v3
-      if: inputs.cargo-cache-clean == 'true'
+      if: inputs.cargo-cache-clean == 'true' && inputs.sccache == 'false'
       with:
         path: ~/.setup-ruby-and-rust/bin/cargo-cache
         key: ${{ steps.set-outputs.outputs.ruby-platform }}-cargo-cache-clean-0.8.3
 
     - name: Install cargo-cache
       id: install-cargo-cache
-      if: inputs.cargo-cache-clean == 'true'
+      if: inputs.cargo-cache-clean == 'true' && inputs.sccache == 'false'
       shell: bash
       run: |
         : Setup cargo-cache
@@ -148,7 +151,7 @@ runs:
 
     - name: Setup cargo cache
       uses: actions/cache@v3
-      if: inputs.cargo-cache == 'true'
+      if: inputs.cargo-cache == 'true' && inputs.sccache == 'false'
       with:
         path: |
           ~/.cargo/bin/
@@ -164,11 +167,39 @@ runs:
           ${{ steps.set-outputs.outputs.cache-key-level-2 }}
 
     - name: Clean the cargo cache
-      if: inputs.cargo-cache-clean == 'true'
+      if: inputs.cargo-cache-clean == 'true' && inputs.sccache == 'false'
       uses: oxidize-rb/actions/post-run@autoclean # TODO: update
       with:
         run: cargo-cache --autoclean
         cwd: ${{ inputs.working-directory }}
+
+    - name: Configure sccache
+      if: inputs.cargo-cache == 'true' && inputs.sccache == 'true'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+          core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+          core.exportVariable('RUSTC_WRAPPER', process.env.RUSTC_WRAPPER || 'sccache');
+          core.exportVariable('SCCACHE_C_CUSTOM_CACHE_BUSTER', '${{ inputs.cache-version }}');
+          core.exportVariable('CARGO_INCREMENTAL', '0');
+          core.exportVariable('SCCACHE_GHA_CACHE_TO', '${{ steps.set-outputs.outputs.cache-key-level-1 }}');
+
+    - name: Install sccache
+      if: inputs.cargo-cache == 'true' && inputs.sccache == 'true'
+      shell: bash
+      run: |
+        : Setup sccache
+        outpath="$HOME/.setup-ruby-and-rust/bin"
+        mkdir -p "$outpath"
+        echo "$outpath" >> $GITHUB_PATH
+
+        if [ ! -f "$outpath/sccache" ]; then
+          toolchain="$(derive_toolchain.rb --runner)"
+          filename="sccache-$version-$toolchain.tar.gz"
+          version="0.3.3"
+          curl -L "https://github.com/mozilla/sccache/releases/download/$version/$filename" | tar -xz --strip-components=1 -C "$GITHUB_ACTION_PATH/bin"
+        fi
 
     - name: Set LD_LIBRARY_PATH for Ruby
       if: runner.os == 'Linux' && inputs.ruby-version != 'none'
@@ -208,6 +239,7 @@ runs:
         if [ "${{ inputs.debug }}" = "true" ]; then
           echo "Setting debug mode"
           echo "RB_SYS_DEBUG_BUILD=1" >> $GITHUB_ENV
+          echo "SCCACHE_LOG=debug" >> $GITHUB_ENV
         fi
 
         if [ "${{ inputs.prefer-ruby-static }}" = "true" ]; then
