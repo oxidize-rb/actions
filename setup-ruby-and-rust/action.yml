@@ -168,13 +168,13 @@ runs:
 
     - name: Clean the cargo cache
       if: inputs.cargo-cache-clean == 'true' && inputs.sccache == 'false'
-      uses: oxidize-rb/actions/post-run@autoclean # TODO: update
+      uses: oxidize-rb/actions/post-run@main # TODO: update
       with:
         run: cargo-cache --autoclean
         cwd: ${{ inputs.working-directory }}
 
     - name: Configure sccache
-      if: inputs.cargo-cache == 'true' && inputs.sccache == 'true'
+      if: inputs.cargo-cache == 'true' || inputs.sccache == 'true'
       uses: actions/github-script@v6
       with:
         script: |
@@ -186,7 +186,7 @@ runs:
           core.exportVariable('SCCACHE_GHA_CACHE_TO', '${{ steps.set-outputs.outputs.cache-key-level-1 }}');
 
     - name: Install sccache
-      if: inputs.cargo-cache == 'true' && inputs.sccache == 'true'
+      if: inputs.cargo-cache == 'true' || inputs.sccache == 'true'
       shell: bash
       run: |
         : Setup sccache
