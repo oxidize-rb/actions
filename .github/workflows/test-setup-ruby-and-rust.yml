@@ -42,10 +42,10 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Log inputs
+      - name: Log matrix
         shell: bash
         env:
-          INPUTS: ${{ toJSON(inputs) }}
+          INPUTS: ${{ toJSON(matrix) }}
         run: |
           echo "$INPUTS" | jq
       - uses: actions/checkout@v3
