@@ -44,14 +44,10 @@ jobs:
     steps:
       - name: Log inputs
         shell: bash
+        env:
+          INPUTS: ${{ toJSON(inputs) }}
         run: |
-          echo "OS: ${{ matrix.os }}"
-          echo "Ruby: ${{ matrix.ruby }}"
-          echo "Rust: ${{ matrix.rust }}"
-          echo "Repo: ${{ matrix.repo.name }}"
-          echo "Ref: ${{ matrix.repo.ref }}"
-          echo "Run: ${{ matrix.repo.run }}"
-          echo "sccache: ${{ matrix.repo.sccache }}"
+          echo "$INPUTS" | jq
       - uses: actions/checkout@v3
         with:
           repository: ${{ matrix.repo.name }}
