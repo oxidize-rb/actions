@@ -42,6 +42,16 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Log inputs
+        shell: bash
+        run: |
+          echo "OS: ${{ matrix.os }}"
+          echo "Ruby: ${{ matrix.ruby }}"
+          echo "Rust: ${{ matrix.rust }}"
+          echo "Repo: ${{ matrix.repo.name }}"
+          echo "Ref: ${{ matrix.repo.ref }}"
+          echo "Run: ${{ matrix.repo.run }}"
+          echo "sccache: ${{ matrix.repo.sccache }}"
       - uses: actions/checkout@v3
         with:
           repository: ${{ matrix.repo.name }}
@@ -58,6 +68,7 @@ jobs:
           bundler-cache: true
           cargo-cache: true
           cargo-cache-clean: true
+          sccache: ${{ matrix.repo.sccache }}
       - name: Run unit tests
         env:
           SETUP_OUTPUTS: ${{ toJSON(steps.setup.outputs) }}
