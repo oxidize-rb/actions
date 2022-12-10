@@ -7,7 +7,7 @@ on:
       - ".github/workflows/test-setup-ruby-and-rust.yml"
 jobs:
   test:
-    name: ${{ runner.os }} ${{ matrix.repo.slug }} ${{ matrix.ruby }} ${{ matrix.cargo-cache }}
+    name: ${{ matrix.os }} ${{ matrix.repo.slug }} ${{ matrix.ruby }} ${{ matrix.cargo-cache }}
     strategy:
       fail-fast: false
       matrix:
