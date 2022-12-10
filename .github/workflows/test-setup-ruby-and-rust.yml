@@ -7,15 +7,17 @@ on:
       - ".github/workflows/test-setup-ruby-and-rust.yml"
 jobs:
   test:
-    name: ${{ matrix.os }} | ${{ matrix.repo.name }} - ${{ matrix.ruby }} - ${{ matrix.rust }}
+    name: ${{ runner.os }} ${{ matrix.repo.slug }} ${{ matrix.ruby }} ${{ matrix.cargo-cache }}
     strategy:
       fail-fast: false
       matrix:
         repo:
           - name: "oxidize-rb/oxi-test"
+            slug: oxi-test
             ref: main
             run: bundle exec rake
           - name: "matsadler/magnus"
+            slug: magnus
             ref: 855cc11a73e536083e37bb89d5e101a02a748150
             run: cargo test
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
@@ -28,10 +30,12 @@ jobs:
             rust: "stable"
             repo:
               name: "oxidize-rb/oxi-test"
+              slug: oxi-test
               ref: main
               run: bundle exec rake
               cargo-cache: "sccache"
           - os: "windows-latest"
+            slug: magnus
             ruby: "mswin"
             rust: "stable"
             repo:
@@ -62,9 +66,8 @@ jobs:
           rustup-toolchain: ${{ matrix.rust }}
           cache-version: v0
           bundler-cache: true
-          cargo-cache: true
+          cargo-cache: ${{ matrix.repo.cargo-cache }}
           cargo-cache-clean: true
-          cargo-cache-strategy: ${{ matrix.repo.cargo-cache-strategy }}
       - name: Run unit tests
         env:
           SETUP_OUTPUTS: ${{ toJSON(steps.setup.outputs) }}
