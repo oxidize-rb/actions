@@ -23,26 +23,35 @@ jobs:
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
         rust: ["stable"]
         ruby: ["2.7", "3.0", "3.1", "head"]
-        cargo-cache: ["tarball", "sccache"]
+        cargo-cache: ["sccache"]
         include:
-          - os: "windows-latest"
-            ruby: "mswin"
+          - os: "ubuntu-latest"
+            ruby: "3.1"
             rust: "stable"
+            cargo-cache: "tarball"
             repo:
               name: "oxidize-rb/oxi-test"
               slug: oxi-test
               ref: main
               run: bundle exec rake
-              cargo-cache: "sccache"
+          - os: "windows-latest"
+            ruby: "mswin"
+            rust: "stable"
+            cargo-cache: "sccache"
+            repo:
+              name: "oxidize-rb/oxi-test"
+              slug: oxi-test
+              ref: main
+              run: bundle exec rake
           - os: "windows-latest"
             slug: magnus
             ruby: "mswin"
             rust: "stable"
+            cargo-cache: "sccache"
             repo:
               name: "matsadler/magnus"
               ref: main
               run: cargo test
-              cargo-cache: "sccache"
 
     runs-on: ${{ matrix.os }}
     steps:
@@ -66,7 +75,7 @@ jobs:
           rustup-toolchain: ${{ matrix.rust }}
           cache-version: v0
           bundler-cache: true
-          cargo-cache: ${{ matrix.repo.cargo-cache }}
+          cargo-cache: ${{ matrix.cargo-cache }}
           cargo-cache-clean: true
       - name: Run unit tests
         env:
