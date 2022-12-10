@@ -5,6 +5,8 @@ on:
     paths:
       - "setup-ruby-and-rust/**/*"
       - ".github/workflows/test-setup-ruby-and-rust.yml"
+env:
+  SCCACHE_LOG: debug
 jobs:
   test:
     name: ${{ matrix.os }} ${{ matrix.repo.slug }} ${{ matrix.ruby }} ${{ matrix.cargo-cache }}
