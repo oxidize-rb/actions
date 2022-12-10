@@ -195,9 +195,9 @@ runs:
         echo "$outpath" >> $GITHUB_PATH
 
         if [ ! -f "$outpath/sccache" ]; then
+          version="v0.3.3"
           toolchain="$(ruby --disable-gems $GITHUB_ACTION_PATH/helpers/derive_toolchain.rb --runner)"
           filename="sccache-$version-$toolchain.tar.gz"
-          version="0.3.3"
           curl -L "https://github.com/mozilla/sccache/releases/download/$version/$filename" | tar -xz --strip-components=1 -C "$GITHUB_ACTION_PATH/bin"
         fi
 
