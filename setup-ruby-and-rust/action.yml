@@ -189,24 +189,12 @@ runs:
           core.exportVariable('CARGO_INCREMENTAL', '0');
           core.exportVariable('SCCACHE_GHA_CACHE_FROM', '${{ steps.rust-toolchain.outputs.cachekey }}');
 
-    - name: Setup sccache keys
-      if: inputs.cargo-cache == 'sccache'
-      shell: bash
-      run: |
-        cache_level_1="${{ steps.rust-toolchain.outputs.cachekey }}__${{ steps.derive-toolchain.outputs.toolchain }}"
-        cache_level_2="${cache_level_1}__${{ hashFiles('**/Cargo.toml') }}"
-        cache_level_3="${cache_level_2}__${{ hashFiles('**/extconf.rb') }}"
-        cache_level_4="${cache_level_3}__${{ hashFiles('**/Cargo.lock') }}"
-
-        echo "SCCACHE_GHA_CACHE_TO=${cache_level_4}" >> $GITHUB_ENV
-        echo "SCCACHE_GHA_CACHE_FROM=$cache_level_4,$cache_level_3,$cache_level_2,$cache_level_1" >> $GITHUB_ENV
-
     - name: Install sccache
       if: inputs.cargo-cache == 'sccache'
       shell: bash
       run: |
         : Setup sccache
-        outpath="$HOME/.setup-ruby-and-rust/bin"
+        outpath="$(ruby -e 'puts File.join(ENV["HOME"], ".setup-ruby-and-rust", "bin")')"
         mkdir -p "$outpath"
         echo "$outpath" >> $GITHUB_PATH
 
@@ -218,6 +206,14 @@ runs:
           curl -L "https://github.com/mozilla/sccache/releases/download/$version/$filename" | tar -xz --strip-components=1
           popd
         fi
+
+        cache_level_1="${{ steps.rust-toolchain.outputs.cachekey }}__${{ steps.derive-toolchain.outputs.toolchain }}"
+        cache_level_2="${cache_level_1}__${{ hashFiles('**/Cargo.toml') }}"
+        cache_level_3="${cache_level_2}__${{ hashFiles('**/extconf.rb') }}"
+        cache_level_4="${cache_level_3}__${{ hashFiles('**/Cargo.lock') }}"
+
+        echo "SCCACHE_GHA_CACHE_TO=${cache_level_4}" >> $GITHUB_ENV
+        echo "SCCACHE_GHA_CACHE_FROM=$cache_level_4,$cache_level_3,$cache_level_2,$cache_level_1" >> $GITHUB_ENV
 
     - name: Set LD_LIBRARY_PATH for Ruby
       if: runner.os == 'Linux' && inputs.ruby-version != 'none'
