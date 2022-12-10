@@ -21,7 +21,7 @@ jobs:
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
         rust: ["stable"]
         ruby: ["2.7", "3.0", "3.1", "head"]
-        sccache: ["true", "false"]
+        cargo-cache: ["tarball", "sccache"]
         include:
           - os: "windows-latest"
             ruby: "mswin"
@@ -30,7 +30,7 @@ jobs:
               name: "oxidize-rb/oxi-test"
               ref: main
               run: bundle exec rake
-              sccache: "false"
+              cargo-cache: "sccache"
           - os: "windows-latest"
             ruby: "mswin"
             rust: "stable"
@@ -38,7 +38,7 @@ jobs:
               name: "matsadler/magnus"
               ref: main
               run: cargo test
-              sccache: "true"
+              cargo-cache: "sccache"
 
     runs-on: ${{ matrix.os }}
     steps:
@@ -64,7 +64,7 @@ jobs:
           bundler-cache: true
           cargo-cache: true
           cargo-cache-clean: true
-          sccache: ${{ matrix.repo.sccache }}
+          cargo-cache-strategy: ${{ matrix.repo.cargo-cache-strategy }}
       - name: Run unit tests
         env:
           SETUP_OUTPUTS: ${{ toJSON(steps.setup.outputs) }}

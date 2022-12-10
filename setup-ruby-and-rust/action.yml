@@ -36,10 +36,7 @@ inputs:
       Comma-separated string of additional components to install e.g. clippy, rustfmt
     default: clippy, rustfmt
   cargo-cache:
-    description: "Automatically cache the target dir and Cargo registry index"
-    default: "false"
-  sccache:
-    description: "Use sccache for faster compilation"
+    description: "Strategy to use for caching build artifacts (either 'sccache', 'tarball', or 'false')"
     default: "false"
   cargo-cache-clean:
     description: "Clean the cargo cache with cargo cache --autoclean"
@@ -132,14 +129,14 @@ runs:
 
     - name: Cache the "cargo-cache" executable
       uses: actions/cache@v3
-      if: inputs.cargo-cache-clean == 'true' && inputs.sccache == 'false'
+      if: inputs.cargo-cache-clean == 'true' && inputs.cargo-cache == 'tarball'
       with:
         path: ~/.setup-ruby-and-rust/bin/cargo-cache
         key: ${{ steps.set-outputs.outputs.ruby-platform }}-cargo-cache-clean-0.8.3
 
     - name: Install cargo-cache
       id: install-cargo-cache
-      if: inputs.cargo-cache-clean == 'true' && inputs.sccache == 'false'
+      if: inputs.cargo-cache-clean == 'true' && inputs.cargo-cache == 'tarball'
       shell: bash
       run: |
         : Setup cargo-cache
@@ -151,7 +148,7 @@ runs:
 
     - name: Setup cargo cache
       uses: actions/cache@v3
-      if: inputs.cargo-cache == 'true' && inputs.sccache == 'false'
+      if: inputs.cargo-cache == 'tarball'
       with:
         path: |
           ~/.cargo/bin/
@@ -167,14 +164,14 @@ runs:
           ${{ steps.set-outputs.outputs.cache-key-level-2 }}
 
     - name: Clean the cargo cache
-      if: inputs.cargo-cache-clean == 'true' && inputs.sccache == 'false'
-      uses: oxidize-rb/actions/post-run@main # TODO: update
+      if: inputs.cargo-cache-clean == 'true' && inputs.cargo-cache == 'tarball'
+      uses: oxidize-rb/actions/post-run@main
       with:
         run: cargo-cache --autoclean
         cwd: ${{ inputs.working-directory }}
 
     - name: Configure sccache
-      if: inputs.cargo-cache == 'true' || inputs.sccache == 'true'
+      if: inputs.cargo-cache == 'sccache'
       uses: actions/github-script@v6
       with:
         script: |
@@ -186,7 +183,7 @@ runs:
           core.exportVariable('SCCACHE_GHA_CACHE_TO', '${{ steps.set-outputs.outputs.cache-key-level-1 }}');
 
     - name: Install sccache
-      if: inputs.cargo-cache == 'true' || inputs.sccache == 'true'
+      if: inputs.cargo-cache == 'sccache'
       shell: bash
       run: |
         : Setup sccache
@@ -198,7 +195,7 @@ runs:
           version="v0.3.3"
           toolchain="$(ruby --disable-gems $GITHUB_ACTION_PATH/helpers/derive_toolchain.rb --runner)"
           filename="sccache-$version-$toolchain.tar.gz"
-          curl -L "https://github.com/mozilla/sccache/releases/download/$version/$filename" | tar -xz --strip-components=1 -C "$GITHUB_ACTION_PATH/bin"
+          curl -L "https://github.com/mozilla/sccache/releases/download/$version/$filename" | tar -xz --strip-components=1 -C "$outpath"
         fi
 
     - name: Set LD_LIBRARY_PATH for Ruby

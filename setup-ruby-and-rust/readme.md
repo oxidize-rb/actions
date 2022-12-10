@@ -49,7 +49,7 @@ jobs:
 | -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
 | **bundler-cache**          | Run "bundle install", and cache the result automatically. Either true or false.                                                                             | `false`           |
 | **cache-version**          | Arbitrary string that will be added to the cache key of the bundler cache. Set or change it if you need to invalidate the cache.                            | `v0`              |
-| **cargo-cache**            | Automatically cache the target dir and Cargo registry index                                                                                                 | `false`           |
+| **cargo-cache**            | Strategy to use for caching build artifacts (either 'sccache', 'tarball', or 'false')                                                                       | `false`           |
 | **cargo-cache-clean**      | Clean the cargo cache with cargo cache --autoclean                                                                                                          | `false`           |
 | **cargo-cache-extra-path** | Paths to cache for cargo and gem compilation                                                                                                                |                   |
 | **cargo-vendor**           | Vendor cargo dependencies to avoid repeated downloads                                                                                                       | `false`           |
@@ -60,7 +60,6 @@ jobs:
 | **rustup-components**      | Comma-separated string of additional components to install e.g. clippy, rustfmt                                                                             | `clippy, rustfmt` |
 | **rustup-targets**         | Comma-separated string of additional targets to install e.g. wasm32-unknown-unknown                                                                         |                   |
 | **rustup-toolchain**       | Rustup toolchain specifier e.g. stable, nightly, 1.42.0, nightly-2022-01-01.                                                                                | `stable`          |
-| **sccache**                | Use sccache for faster compilation                                                                                                                          | `false`           |
 | **working-directory**      | The working directory to use for resolving paths for .ruby-version, .tool-versions and Gemfile.lock.                                                        |                   |
 
 <!-- /inputs -->
