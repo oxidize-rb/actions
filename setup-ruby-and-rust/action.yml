@@ -146,15 +146,22 @@ runs:
 
         echo "$HOME/.setup-ruby-and-rust/bin" >> $GITHUB_PATH
 
+    - name: Cargo registry cache
+      uses: actions/cache@v3
+      if: inputs.cargo-cache != 'false'
+      with:
+        key: cargo-registry
+        path: |
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+
     - name: Setup cargo cache
       uses: actions/cache@v3
       if: inputs.cargo-cache == 'tarball'
       with:
         path: |
           ~/.cargo/bin/
-          ~/.cargo/registry/index/
-          ~/.cargo/registry/cache/
-          ~/.cargo/git/db/
           **/target/
           **/tmp/${{ steps.set-outputs.outputs.ruby-platform }}/
           ${{ inputs.cargo-cache-extra-path }}
@@ -192,10 +199,12 @@ runs:
         echo "$outpath" >> $GITHUB_PATH
 
         if [ ! -f "$outpath/sccache" ]; then
+          pushd "$outpath"
           version="v0.3.3"
           toolchain="$(ruby --disable-gems $GITHUB_ACTION_PATH/helpers/derive_toolchain.rb --runner)"
           filename="sccache-$version-$toolchain.tar.gz"
-          curl -L "https://github.com/mozilla/sccache/releases/download/$version/$filename" | tar -xz --strip-components=1 -C "$outpath"
+          curl -L "https://github.com/mozilla/sccache/releases/download/$version/$filename" | tar -xz --strip-components=1
+          popd
         fi
 
     - name: Set LD_LIBRARY_PATH for Ruby
