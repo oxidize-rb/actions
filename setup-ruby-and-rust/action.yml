@@ -178,7 +178,7 @@ runs:
         cwd: ${{ inputs.working-directory }}
 
     - name: Configure sccache
-      if: inputs.cargo-cache == 'sccache'
+      if: inputs.cargo-cache == 'sccache' || inputs.cargo-cache == 'true'
       uses: actions/github-script@v6
       with:
         script: |
@@ -190,7 +190,7 @@ runs:
           core.exportVariable('SCCACHE_GHA_CACHE_FROM', '${{ steps.rust-toolchain.outputs.cachekey }}');
 
     - name: Install sccache
-      if: inputs.cargo-cache == 'sccache'
+      if: inputs.cargo-cache == 'sccache' || inputs.cargo-cache == 'true'
       shell: bash
       run: |
         : Setup sccache
