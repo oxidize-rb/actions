@@ -186,7 +186,7 @@ runs:
       uses: actions/cache@v3
       if: steps.set-outputs.outputs.cargo-cache == 'tarball'
       with:
-        key: ${{ steps.set-outputs.outputs.ext-cachel-level-3 }}
+        key: ${{ steps.set-outputs.outputs.ext-cache-key-level-3 }}
         path: |
           **/tmp/${{ steps.set-outputs.outputs.ruby-platform }}/target/
           ${{ inputs.cargo-cache-extra-path }}
