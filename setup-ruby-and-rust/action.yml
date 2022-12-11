@@ -128,6 +128,7 @@ runs:
         echo "ext-cache-key-level-1=$ext_cache_level_1" >> $GITHUB_OUTPUT
         echo "ext-cache-key-level-2=$ext_cache_level_2" >> $GITHUB_OUTPUT
         echo "ext-cache-key-level-3=$ext_cache_level_3" >> $GITHUB_OUTPUT
+        echo "cache-key=$ext_cache_level_3" >> $GITHUB_OUTPUT
 
         ruby --disable-gems $GITHUB_ACTION_PATH/helpers/cargo_registry_cache_keys.rb
 
