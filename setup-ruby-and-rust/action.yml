@@ -174,25 +174,25 @@ runs:
       uses: actions/cache@v3
       if: steps.set-outputs.outputs.cargo-cache == 'tarball'
       with:
+        key: ${{ steps.set-outputs.outputs.base-cachel-level-3 }}
         path: |
           ~/.cargo/bin/
-          target/
-        key: ${{ steps.set-outputs.outputs.base-cachel-level-3 }}
+          ./target/
         restore-keys: |
-          ${{ steps.set-outputs.outputs.base-cachel-level-2 }}
-          ${{ steps.set-outputs.outputs.base-cachel-level-1 }}
+          ${{ steps.set-outputs.outputs.base-cache-key-level-2 }}
+          ${{ steps.set-outputs.outputs.base-cache-key-level-1 }}
 
     - name: Setup ext cargo cache
       uses: actions/cache@v3
       if: steps.set-outputs.outputs.cargo-cache == 'tarball'
       with:
+        key: ${{ steps.set-outputs.outputs.ext-cachel-level-3 }}
         path: |
           **/tmp/${{ steps.set-outputs.outputs.ruby-platform }}/
           ${{ inputs.cargo-cache-extra-path }}
-        key: ${{ steps.set-outputs.outputs.ext-cachel-level-3 }}
         restore-keys: |
-          ${{ steps.set-outputs.outputs.ext-cachel-level-2 }}
-          ${{ steps.set-outputs.outputs.ext-cachel-level-1 }}
+          ${{ steps.set-outputs.outputs.ext-cache-key-level-2 }}
+          ${{ steps.set-outputs.outputs.ext-cache-key-level-1 }}
 
     - name: Clean the cargo cache
       if: inputs.cargo-cache-clean == 'true' && steps.set-outputs.outputs.cargo-cache == 'tarball'
