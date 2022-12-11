@@ -45,22 +45,22 @@ jobs:
 
 <!-- inputs -->
 
-| Name                       | Description                                                                                                                      | Default           |
-| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
-| **bundler-cache**          | Run "bundle install", and cache the result automatically. Either true or false.                                                  | `false`           |
-| **cache-version**          | Arbitrary string that will be added to the cache key of the bundler cache. Set or change it if you need to invalidate the cache. | `v0`              |
-| **cargo-cache**            | Automatically cache the target dir and Cargo registry index                                                                      | `false`           |
-| **cargo-cache-clean**      | Clean the cargo cache with cargo cache --autoclean                                                                               | `false`           |
-| **cargo-cache-extra-path** | Paths to cache for cargo and gem compilation                                                                                     |                   |
-| **cargo-vendor**           | Vendor cargo dependencies to avoid repeated downloads                                                                            | `false`           |
-| **debug**                  | Enable verbose debugging info (includes summary of action)                                                                       | `false`           |
-| **prefer-ruby-static**     | Prefer using libruby static if it's available                                                                                    | `false`           |
-| **ruby-version**           | Engine and version to use, see the syntax in the README. Reads from .ruby-version or .tool-versions if unset.                    | `default`         |
-| **rubygems**               | Runs `gem update --system`. See https://github.com/ruby/setup-ruby/blob/master/README.md for more info.                          | `default`         |
-| **rustup-components**      | Comma-separated string of additional components to install e.g. clippy, rustfmt                                                  | `clippy, rustfmt` |
-| **rustup-targets**         | Comma-separated string of additional targets to install e.g. wasm32-unknown-unknown                                              |                   |
-| **rustup-toolchain**       | Rustup toolchain specifier e.g. stable, nightly, 1.42.0, nightly-2022-01-01.                                                     | `stable`          |
-| **working-directory**      | The working directory to use for resolving paths for .ruby-version, .tool-versions and Gemfile.lock.                             |                   |
+| Name                       | Description                                                                                                                                                 | Default           |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
+| **bundler-cache**          | Run "bundle install", and cache the result automatically. Either true or false.                                                                             | `false`           |
+| **cache-version**          | Arbitrary string that will be added to the cache key of the bundler cache. Set or change it if you need to invalidate the cache.                            | `v0`              |
+| **cargo-cache**            | Strategy to use for caching build artifacts (either 'sccache', 'tarball', or 'false')                                                                       | `default`         |
+| **cargo-cache-clean**      | Clean the cargo cache with cargo cache --autoclean                                                                                                          | `false`           |
+| **cargo-cache-extra-path** | Paths to cache for cargo and gem compilation                                                                                                                |                   |
+| **cargo-vendor**           | Vendor cargo dependencies to avoid repeated downloads                                                                                                       | `false`           |
+| **debug**                  | Enable verbose debugging info (includes summary of action)                                                                                                  | `false`           |
+| **prefer-ruby-static**     | Prefer using libruby static if it's available                                                                                                               | `false`           |
+| **ruby-version**           | Engine and version to use, see the syntax in the README. Reads from .ruby-version or .tool-versions if unset. Can be set to 'none' to skip installing Ruby. | `default`         |
+| **rubygems**               | Runs `gem update --system`. See https://github.com/ruby/setup-ruby/blob/master/README.md for more info.                                                     | `default`         |
+| **rustup-components**      | Comma-separated string of additional components to install e.g. clippy, rustfmt                                                                             | `clippy, rustfmt` |
+| **rustup-targets**         | Comma-separated string of additional targets to install e.g. wasm32-unknown-unknown                                                                         |                   |
+| **rustup-toolchain**       | Rustup toolchain specifier e.g. stable, nightly, 1.42.0, nightly-2022-01-01.                                                                                | `stable`          |
+| **working-directory**      | The working directory to use for resolving paths for .ruby-version, .tool-versions and Gemfile.lock.                                                        |                   |
 
 <!-- /inputs -->
 

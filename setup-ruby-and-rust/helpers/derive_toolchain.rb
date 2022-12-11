@@ -13,4 +13,16 @@ def derive_rust_toolchain_from_rbconfig(input_rust_toolchain)
   end
 end
 
-puts derive_rust_toolchain_from_rbconfig(ARGV.first)
+if ARGV.include?("--runner")
+  case RbConfig::CONFIG["host_os"]
+  when /mingw|mswin/
+    puts "x86_64-pc-windows-msvc"
+  when /darwin/
+    puts "x86_64-apple-darwin"
+  when /linux/
+    puts "x86_64-unknown-linux-musl"
+  end
+else
+  puts derive_rust_toolchain_from_rbconfig(ARGV.first)
+end
+

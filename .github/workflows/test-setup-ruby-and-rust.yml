@@ -5,33 +5,51 @@ on:
     paths:
       - "setup-ruby-and-rust/**/*"
       - ".github/workflows/test-setup-ruby-and-rust.yml"
+env:
+  SCCACHE_LOG: debug
 jobs:
   test:
-    name: ${{ matrix.os }} | ${{ matrix.repo.name }} - ${{ matrix.ruby }} - ${{ matrix.rust }}
+    name: ${{ matrix.os }} ${{ matrix.repo.slug }} ${{ matrix.ruby }} ${{ matrix.cargo-cache }}
     strategy:
       fail-fast: false
       matrix:
         repo:
           - name: "oxidize-rb/oxi-test"
+            slug: oxi-test
             ref: main
             run: bundle exec rake
           - name: "matsadler/magnus"
+            slug: magnus
             ref: 855cc11a73e536083e37bb89d5e101a02a748150
             run: cargo test
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
         rust: ["stable"]
         ruby: ["2.7", "3.0", "3.1", "head"]
+        cargo-cache: ["true"]
         include:
-          - os: "windows-latest"
-            ruby: "mswin"
+          - os: "ubuntu-latest"
+            ruby: "3.1"
             rust: "stable"
+            cargo-cache: "tarball"
             repo:
               name: "oxidize-rb/oxi-test"
+              slug: oxi-test
               ref: main
               run: bundle exec rake
           - os: "windows-latest"
             ruby: "mswin"
             rust: "stable"
+            cargo-cache: "true"
+            repo:
+              name: "oxidize-rb/oxi-test"
+              slug: oxi-test
+              ref: main
+              run: bundle exec rake
+          - os: "windows-latest"
+            slug: magnus
+            ruby: "mswin"
+            rust: "stable"
+            cargo-cache: "true"
             repo:
               name: "matsadler/magnus"
               ref: main
@@ -39,6 +57,12 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Log matrix
+        shell: bash
+        env:
+          INPUTS: ${{ toJSON(matrix) }}
+        run: |
+          echo "$INPUTS" | jq
       - uses: actions/checkout@v3
         with:
           repository: ${{ matrix.repo.name }}
@@ -53,7 +77,7 @@ jobs:
           rustup-toolchain: ${{ matrix.rust }}
           cache-version: v0
           bundler-cache: true
-          cargo-cache: true
+          cargo-cache: ${{ matrix.cargo-cache }}
           cargo-cache-clean: true
       - name: Run unit tests
         env:
