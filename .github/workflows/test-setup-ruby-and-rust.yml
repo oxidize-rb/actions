@@ -25,7 +25,7 @@ jobs:
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
         rust: ["stable"]
         ruby: ["2.7", "3.0", "3.1", "head"]
-        cargo-cache: ["sccache"]
+        cargo-cache: ["true"]
         include:
           - os: "ubuntu-latest"
             ruby: "3.1"
@@ -39,7 +39,7 @@ jobs:
           - os: "windows-latest"
             ruby: "mswin"
             rust: "stable"
-            cargo-cache: "sccache"
+            cargo-cache: "true"
             repo:
               name: "oxidize-rb/oxi-test"
               slug: oxi-test
@@ -49,7 +49,7 @@ jobs:
             slug: magnus
             ruby: "mswin"
             rust: "stable"
-            cargo-cache: "sccache"
+            cargo-cache: "true"
             repo:
               name: "matsadler/magnus"
               ref: main
