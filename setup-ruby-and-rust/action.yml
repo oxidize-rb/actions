@@ -124,8 +124,25 @@ runs:
         echo "cache-key-level-2=$cache_level_2" >> $GITHUB_OUTPUT
         echo "cache-key-level-3=$cache_level_3" >> $GITHUB_OUTPUT
         echo "cache-key-level-4=$cache_level_4" >> $GITHUB_OUTPUT
-
         echo "cache-key=${cache_level_4}" >> $GITHUB_OUTPUT
+
+        # Since the cargo registry is a moving target, we generate cache keys
+        # based on some recent dates
+        cargo_registry_cache_keys=()
+        prefix="cargo-registry__"
+
+        for i in {0..12}; do
+          cargo_registry_cache_keys+=("$(echo "$prefix$(date -v -"$i"H '+%Y-%m-%d-%H')")")
+          cargo_registry_cache_keys+=("$(echo "$prefix$(date -v -"$i"d '+%Y-%m-%d')")")
+          cargo_registry_cache_keys+=("$(echo "$prefix$(date -v -"$i"m '+%Y-%m')")")
+        done
+
+        # Use the first key as the root cache key
+        echo "cargo-registry-cache-key=${cargo_registry_cache_keys[0]}" >> $GITHUB_OUTPUT
+        cargo_registry_cache_keys="${cargo_registry_cache_keys[@]:1}"
+        cargo_registry_restore_keys_string="${cargo_registry_cache_keys[@]}"
+        echo "cargo-registry-restore-keys=${cargo_registry_restore_keys_string//$' '/%0A}" >> $GITHUB_OUTPUT
+
 
     - name: Cache the "cargo-cache" executable
       uses: actions/cache@v3
@@ -150,7 +167,9 @@ runs:
       uses: actions/cache@v3
       if: inputs.cargo-cache != 'false'
       with:
-        key: cargo-registry
+        key: ${{ steps.set-outputs.outputs.cache-key }}
+        restore-keys: |
+          ${{ steps.set-outputs.outputs.cargo-registry-restore-keys }}
         path: |
           ~/.cargo/registry/index/
           ~/.cargo/registry/cache/
