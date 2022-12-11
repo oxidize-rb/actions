@@ -235,10 +235,10 @@ runs:
         echo "Ruby libdir is $libdir"
 
         if [ ! -z "$LD_LIBRARY_PATH" ]; then
-          echo "Appending to LD_LIBRARY_PATH"
+          echo "::info::Appending to LD_LIBRARY_PATH"
           echo "LD_LIBRARY_PATH=$libdir:$LD_LIBRARY_PATH" >> $GITHUB_ENV
         else
-          echo "Setting new LD_LIBRARY_PATH"
+          echo "::info::Setting new LD_LIBRARY_PATH"
           echo "LD_LIBRARY_PATH=$libdir" >> $GITHUB_ENV
         fi
         echo "::endgroup::"
@@ -261,7 +261,7 @@ runs:
         echo "::group::Configuring environment"
 
         if [ "${{ inputs.debug }}" = "true" ]; then
-          echo "Setting debug mode"
+          echo "::info::Setting debug mode"
           echo "RB_SYS_DEBUG_BUILD=1" >> $GITHUB_ENV
           echo "SCCACHE_LOG=debug" >> $GITHUB_ENV
         fi
