@@ -6,7 +6,7 @@ require "securerandom"
 cargo_registry_cache_keys = []
 prefix = "cr"
 
-(0..8).each do |i|
+(0..7).each do |i|
   cargo_registry_cache_keys << "#{prefix}#{(Time.now - (i * 60 * 60 * 24)).strftime("%Y%m%d")}"
 end
 
