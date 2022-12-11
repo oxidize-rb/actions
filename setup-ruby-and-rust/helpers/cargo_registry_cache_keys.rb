@@ -17,7 +17,7 @@ end
 end
 
 cache_key = cargo_registry_cache_keys[0]
-restore_keys = cargo_registry_cache_keys[1..-1].join("%0A")
+restore_keys = cargo_registry_cache_keys[1..-1].join("'%0A'")
 
 File.open(ENV.fetch("GITHUB_OUTPUT"), "a") do |f|
   f.puts "cargo-registry-cache-key=\"#{cache_key}\""
