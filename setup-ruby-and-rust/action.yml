@@ -40,7 +40,7 @@ inputs:
     default: "default"
   cargo-cache-clean:
     description: "Clean the cargo cache with cargo cache --autoclean"
-    default: "false"
+    default: "true"
   cargo-cache-extra-path:
     description: "Paths to cache for cargo and gem compilation"
   cargo-vendor:
@@ -188,7 +188,7 @@ runs:
       with:
         key: ${{ steps.set-outputs.outputs.ext-cachel-level-3 }}
         path: |
-          **/tmp/${{ steps.set-outputs.outputs.ruby-platform }}/
+          **/tmp/${{ steps.set-outputs.outputs.ruby-platform }}/target/
           ${{ inputs.cargo-cache-extra-path }}
         restore-keys: |
           ${{ steps.set-outputs.outputs.ext-cache-key-level-2 }}
