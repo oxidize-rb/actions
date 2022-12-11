@@ -151,7 +151,7 @@ runs:
       uses: actions/cache@v3
       if: inputs.cargo-cache != 'false'
       with:
-        key: ${{ steps.set-outputs.outputs.cache-key }}
+        key: ${{ steps.set-outputs.outputs.cargo-registry-cache-key }}
         restore-keys: |
           ${{ steps.set-outputs.outputs.cargo-registry-restore-keys }}
         path: |
