@@ -12,13 +12,6 @@ OUTPUTS = JSON.parse(ENV.fetch("SETUP_OUTPUTS"))
 
 describe "setup-ruby-and-ruby" do
   describe "output validation" do
-    it "has has a valid cache-key" do
-      parts = OUTPUTS["cache-key"].split("__")
-
-      assert_equal 7, parts.size
-      assert parts.all? { |part| !part.strip.empty? }
-    end
-
     it "has has a valid ruby-platform" do
       assert_equal RbConfig::CONFIG["arch"], OUTPUTS["ruby-platform"]
     end
