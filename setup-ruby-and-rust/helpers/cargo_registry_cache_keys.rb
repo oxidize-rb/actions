@@ -6,20 +6,19 @@ require "securerandom"
 cargo_registry_cache_keys = []
 prefix = "cr"
 
-(0..12).each do |i|
-  cargo_registry_cache_keys << "#{prefix}#{(Time.now - (i * 60 * 60)).strftime("%Y%m%d%H")}"
-end
-
-(0..21).each do |i|
+(0..9).each do |i|
   cargo_registry_cache_keys << "#{prefix}#{(Time.now - (i * 60 * 60 * 24)).strftime("%Y%m%d")}"
 end
 
-(0..3).each do |i|
+(0..1).each do |i|
   cargo_registry_cache_keys << "#{prefix}#{(Time.now - (i * 60 * 60 * 24 * 30)).strftime("%Y%m")}"
 end
 
 cache_key = cargo_registry_cache_keys[0]
 restore_keys = cargo_registry_cache_keys[1..-1].join("\n")
+
+raise 'too many keys' if restore_keys.count("\n") > 10
+raise 'not enough keys' if restore_keys.count("\n") < 10
 
 def set_output(key, value)
   eol = $/
