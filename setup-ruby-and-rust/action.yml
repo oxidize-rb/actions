@@ -123,8 +123,8 @@ runs:
         echo "base-cache-key-level-3=$base_cache_level_3" >> $GITHUB_OUTPUT
 
         ext_cache_level_1="${base_cache_level_1}__${{ hashFiles('**/extconf.rb') }}"``
-        ext_cache_level_2="${ext_cache_level_2}__${{ hashFiles('**/Gemfile') }}"``
-        ext_cache_level_3="${ext_cache_level_3}__${{ hashFiles('**/Gemfile.lock') }}"``
+        ext_cache_level_2="${ext_cache_level_1}__${{ hashFiles('**/Gemfile') }}"``
+        ext_cache_level_3="${ext_cache_level_2}__${{ hashFiles('**/Gemfile.lock') }}"``
         echo "ext-cache-key-level-1=$ext_cache_level_1" >> $GITHUB_OUTPUT
         echo "ext-cache-key-level-2=$ext_cache_level_2" >> $GITHUB_OUTPUT
         echo "ext-cache-key-level-3=$ext_cache_level_3" >> $GITHUB_OUTPUT
