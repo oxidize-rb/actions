@@ -37,7 +37,7 @@ inputs:
     default: clippy, rustfmt
   cargo-cache:
     description: "Strategy to use for caching build artifacts (either 'sccache', 'tarball', or 'false')"
-    default: "false"
+    default: "default"
   cargo-cache-clean:
     description: "Clean the cargo cache with cargo cache --autoclean"
     default: "false"
@@ -130,6 +130,9 @@ runs:
 
         if [ "${{ inputs.cargo-cache }}" = "true" ]; then
           echo "::warning::cargo-cache now defaults to 'sccache' instead of 'tarball'. Please update your workflow to use 'sccache' instead of 'true'. If you experience issues with 'sccache', you can use 'tarball' instead (but please report this upstream)."
+          echo "cargo-cache=sccache" >> $GITHUB_OUTPUT
+        elif [ "${{ inputs.cargo-cache }}" = "default" ]; then
+          echo "::warning::cargo-cache now defaults to 'sccache' when no argument is provided. If you would like to disable caching, please explicitly set cargo-cache: 'false'."
           echo "cargo-cache=sccache" >> $GITHUB_OUTPUT
         else
           echo "cargo-cache=${{ inputs.cargo-cache }}" >> $GITHUB_OUTPUT

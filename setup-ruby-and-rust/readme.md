@@ -49,7 +49,7 @@ jobs:
 | -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
 | **bundler-cache**          | Run "bundle install", and cache the result automatically. Either true or false.                                                                             | `false`           |
 | **cache-version**          | Arbitrary string that will be added to the cache key of the bundler cache. Set or change it if you need to invalidate the cache.                            | `v0`              |
-| **cargo-cache**            | Strategy to use for caching build artifacts (either 'sccache', 'tarball', or 'false')                                                                       | `false`           |
+| **cargo-cache**            | Strategy to use for caching build artifacts (either 'sccache', 'tarball', or 'false')                                                                       | `default`         |
 | **cargo-cache-clean**      | Clean the cargo cache with cargo cache --autoclean                                                                                                          | `false`           |
 | **cargo-cache-extra-path** | Paths to cache for cargo and gem compilation                                                                                                                |                   |
 | **cargo-vendor**           | Vendor cargo dependencies to avoid repeated downloads                                                                                                       | `false`           |
