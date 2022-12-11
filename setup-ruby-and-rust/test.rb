@@ -8,15 +8,31 @@ end
 require "maxitest/autorun"
 require "json"
 
-OUTPUTS = JSON.parse(ENV.fetch("SETUP_OUTPUTS"))
+OUTPUTS = begin
+  JSON.parse(ENV.fetch("SETUP_OUTPUTS"))
+rescue KeyError
+  raise if ENV["CI"]
+
+  {
+    "ruby-platform" => RbConfig::CONFIG["arch"],
+    "ruby-prefix" => RbConfig::CONFIG["prefix"],
+    "base-cache-key-level-1" => "v0__test__it",
+  }
+end
 
 describe "setup-ruby-and-ruby" do
   describe "output validation" do
-    it "has has a valid cache-key" do
-      parts = OUTPUTS["cache-key"].split("__")
+    OUTPUTS.each do |key, value|
+      next unless key.include?("cache-key")
 
-      assert_equal 7, parts.size
-      assert parts.all? { |part| !part.strip.empty? }
+      it "has a valid value for #{key.inspect}" do
+        assert value !~ /__\s*__/
+        assert !value.start_with?("__")
+        assert !value.end_with?("__")
+        assert value.start_with?("v")
+
+        assert value.split("__").uniq.size == value.split("__").size
+      end
     end
 
     it "has has a valid ruby-platform" do

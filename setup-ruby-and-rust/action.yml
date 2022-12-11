@@ -40,7 +40,7 @@ inputs:
     default: "default"
   cargo-cache-clean:
     description: "Clean the cargo cache with cargo cache --autoclean"
-    default: "false"
+    default: "true"
   cargo-cache-extra-path:
     description: "Paths to cache for cargo and gem compilation"
   cargo-vendor:
@@ -115,25 +115,27 @@ runs:
         echo "ruby-prefix=$(rbconfig prefix)" >> $GITHUB_OUTPUT
         echo "ruby-platform=$ruby_platform" >> $GITHUB_OUTPUT
 
-        cache_level_1="${{ inputs.cache-version }}__$(rbconfig ruby_version)__${ruby_platform}__${{ steps.rust-toolchain.outputs.cachekey }}"
-        cache_level_2="${cache_level_1}__${{ hashFiles('**/extconf.rb') }}"
-        cache_level_3="${cache_level_2}__${{ hashFiles('**/Cargo.toml', '**/Gemfile') }}"
-        cache_level_4="${cache_level_3}__${{ hashFiles('**/Cargo.lock', '**/Gemfile.lock') }}"
+        base_cache_level_1="${{ inputs.cache-version }}__${{ steps.rust-toolchain.outputs.cachekey }}__${ruby_platform}"
+        base_cache_level_2="${base_cache_level_1}__${{ hashFiles('**/Cargo.toml') }}"
+        base_cache_level_3="${base_cache_level_2}__${{ hashFiles('**/Cargo.lock') }}"
+        echo "base-cache-key-level-1=$base_cache_level_1" >> $GITHUB_OUTPUT
+        echo "base-cache-key-level-2=$base_cache_level_2" >> $GITHUB_OUTPUT
+        echo "base-cache-key-level-3=$base_cache_level_3" >> $GITHUB_OUTPUT
 
-        echo "cache-key-level-1=$cache_level_1" >> $GITHUB_OUTPUT
-        echo "cache-key-level-2=$cache_level_2" >> $GITHUB_OUTPUT
-        echo "cache-key-level-3=$cache_level_3" >> $GITHUB_OUTPUT
-        echo "cache-key-level-4=$cache_level_4" >> $GITHUB_OUTPUT
-        echo "cache-key=${cache_level_4}" >> $GITHUB_OUTPUT
+        ext_cache_level_1="${base_cache_level_1}__${{ hashFiles('**/extconf.rb') }}"``
+        ext_cache_level_2="${ext_cache_level_1}__${{ hashFiles('**/Gemfile') }}"``
+        ext_cache_level_3="${ext_cache_level_2}__${{ hashFiles('**/Gemfile.lock') }}"``
+        echo "ext-cache-key-level-1=$ext_cache_level_1" >> $GITHUB_OUTPUT
+        echo "ext-cache-key-level-2=$ext_cache_level_2" >> $GITHUB_OUTPUT
+        echo "ext-cache-key-level-3=$ext_cache_level_3" >> $GITHUB_OUTPUT
+        echo "cache-key=$ext_cache_level_3" >> $GITHUB_OUTPUT
 
         ruby --disable-gems $GITHUB_ACTION_PATH/helpers/cargo_registry_cache_keys.rb
 
         if [ "${{ inputs.cargo-cache }}" = "true" ]; then
-          echo "::warning::cargo-cache now defaults to 'sccache' instead of 'tarball'. Please update your workflow to use 'sccache' instead of 'true'. If you experience issues with 'sccache', you can use 'tarball' instead (but please report this upstream)."
-          echo "cargo-cache=sccache" >> $GITHUB_OUTPUT
+          echo "cargo-cache=tarball" >> $GITHUB_OUTPUT
         elif [ "${{ inputs.cargo-cache }}" = "default" ]; then
-          echo "::warning::cargo-cache now defaults to 'sccache' when no argument is provided. If you would like to disable caching, please explicitly set cargo-cache: 'false'."
-          echo "cargo-cache=sccache" >> $GITHUB_OUTPUT
+          echo "cargo-cache=tarball" >> $GITHUB_OUTPUT
         else
           echo "cargo-cache=${{ inputs.cargo-cache }}" >> $GITHUB_OUTPUT
         fi
@@ -169,19 +171,29 @@ runs:
           ~/.cargo/registry/cache/
           ~/.cargo/git/db/
 
-    - name: Setup cargo cache
+    - name: Setup base cargo cache
       uses: actions/cache@v3
       if: steps.set-outputs.outputs.cargo-cache == 'tarball'
       with:
+        key: ${{ steps.set-outputs.outputs.base-cache-key-level-3 }}
         path: |
           ~/.cargo/bin/
-          **/target/
-          **/tmp/${{ steps.set-outputs.outputs.ruby-platform }}/
-          ${{ inputs.cargo-cache-extra-path }}
-        key: ${{ steps.set-outputs.outputs.cache-key }}
+          ./target/
         restore-keys: |
-          ${{ steps.set-outputs.outputs.cache-key-level-3 }}
-          ${{ steps.set-outputs.outputs.cache-key-level-2 }}
+          ${{ steps.set-outputs.outputs.base-cache-key-level-2 }}
+          ${{ steps.set-outputs.outputs.base-cache-key-level-1 }}
+
+    - name: Setup ext cargo cache
+      uses: actions/cache@v3
+      if: steps.set-outputs.outputs.cargo-cache == 'tarball'
+      with:
+        key: ${{ steps.set-outputs.outputs.ext-cache-key-level-3 }}
+        path: |
+          **/tmp/${{ steps.set-outputs.outputs.ruby-platform }}/target/
+          ${{ inputs.cargo-cache-extra-path }}
+        restore-keys: |
+          ${{ steps.set-outputs.outputs.ext-cache-key-level-2 }}
+          ${{ steps.set-outputs.outputs.ext-cache-key-level-1 }}
 
     - name: Clean the cargo cache
       if: inputs.cargo-cache-clean == 'true' && steps.set-outputs.outputs.cargo-cache == 'tarball'
@@ -199,19 +211,17 @@ runs:
           core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
           core.exportVariable('RUSTC_WRAPPER', process.env.RUSTC_WRAPPER || 'sccache');
           core.exportVariable('SCCACHE_C_CUSTOM_CACHE_BUSTER', '${{ inputs.cache-version }}-${{ steps.rust-toolchain.outputs.cachekey }}');
-          core.exportVariable('CARGO_INCREMENTAL', '0');
-          core.exportVariable('SCCACHE_GHA_CACHE_FROM', '${{ steps.rust-toolchain.outputs.cachekey }}');
 
     - name: Install sccache
       if: steps.set-outputs.outputs.cargo-cache == 'sccache'
       shell: bash
       run: |
         : Setup sccache
-        outpath="$(ruby -e 'puts File.join(ENV["HOME"], ".setup-ruby-and-rust", "bin")')"
-        mkdir -p "$outpath"
-        echo "$outpath" >> $GITHUB_PATH
 
-        if [ ! -f "$outpath/sccache" ]; then
+        if ! command -v sccache &> /dev/null; then
+          outpath="$(ruby -e 'puts File.join(ENV["HOME"], ".setup-ruby-and-rust", "bin")')"
+          mkdir -p "$outpath"
+          echo "$outpath" >> $GITHUB_PATH
           pushd "$outpath"
           version="v0.3.3"
           toolchain="$(ruby --disable-gems $GITHUB_ACTION_PATH/helpers/derive_toolchain.rb --runner)"
@@ -220,13 +230,11 @@ runs:
           popd
         fi
 
-        cache_level_1="${{ steps.rust-toolchain.outputs.cachekey }}__${{ steps.derive-toolchain.outputs.toolchain }}"
-        cache_level_2="${cache_level_1}__${{ hashFiles('**/Cargo.toml') }}"
-        cache_level_3="${cache_level_2}__${{ hashFiles('**/extconf.rb') }}"
-        cache_level_4="${cache_level_3}__${{ hashFiles('**/Cargo.lock') }}"
+        cache_from="${{ steps.rust-toolchain.outputs.cachekey }}__${{ steps.derive-toolchain.outputs.toolchain }}"
+        cache_to="${cache_from}__${GITHUB_SHA}"
 
-        echo "SCCACHE_GHA_CACHE_TO=${cache_level_4}" >> $GITHUB_ENV
-        echo "SCCACHE_GHA_CACHE_FROM=$cache_level_4,$cache_level_3,$cache_level_2,$cache_level_1" >> $GITHUB_ENV
+        echo "SCCACHE_GHA_CACHE_FROM=$cache_from" >> $GITHUB_ENV
+        echo "SCCACHE_GHA_CACHE_TO=$cache_to" >> $GITHUB_ENV
 
     - name: Set LD_LIBRARY_PATH for Ruby
       if: runner.os == 'Linux' && inputs.ruby-version != 'none'
@@ -263,11 +271,14 @@ runs:
         : Configure environment
         echo "::group::Configuring environment"
 
+        echo "CARGO_INCREMENTAL=0" >> $GITHUB_ENV
+
         if [ "${{ inputs.debug }}" = "true" ]; then
           echo "::info::Setting debug mode"
           echo "RB_SYS_DEBUG_BUILD=1" >> $GITHUB_ENV
           echo "SCCACHE_LOG=debug" >> $GITHUB_ENV
         fi
+
 
         if [ "${{ inputs.prefer-ruby-static }}" = "true" ]; then
           echo "::group::Attempting to configure static libruby"
