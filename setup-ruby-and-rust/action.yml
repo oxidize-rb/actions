@@ -126,28 +126,7 @@ runs:
         echo "cache-key-level-4=$cache_level_4" >> $GITHUB_OUTPUT
         echo "cache-key=${cache_level_4}" >> $GITHUB_OUTPUT
 
-        # Since the cargo registry is a moving target, we generate cache keys
-        # based on some recent dates
-        cargo_registry_cache_keys=()
-        prefix="cr"
-
-        for i in {0..3}; do
-          cargo_registry_cache_keys+=("$(echo "$prefix$(date -v -"$i"H '+%Y%m%d%H')")")
-        done
-
-        for i in {0..10}; do
-          cargo_registry_cache_keys+=("$(echo "$prefix$(date -v -"$i"d '+%Y%m%d')")")
-        done
-
-        for i in {0..2}; do
-          cargo_registry_cache_keys+=("$(echo "$prefix$(date -v -"$i"m '+%Y%m')")")
-        done
-
-        # Use the first key as the root cache key
-        echo "cargo-registry-cache-key=${cargo_registry_cache_keys[0]}" >> $GITHUB_OUTPUT
-        cargo_registry_cache_keys="${cargo_registry_cache_keys[@]:1}"
-        cargo_registry_restore_keys_string="${cargo_registry_cache_keys[@]}"
-        echo "cargo-registry-restore-keys=${cargo_registry_restore_keys_string//$' '/%0A}" >> $GITHUB_OUTPUT
+        ruby --disable-gems $GITHUB_ACTION_PATH/helpers/cargo_registry_cache_keys.rb
 
     - name: Cache the "cargo-cache" executable
       uses: actions/cache@v3
