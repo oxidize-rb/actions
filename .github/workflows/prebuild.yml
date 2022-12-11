@@ -1,0 +1,68 @@
+---
+name: "Prebuild"
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "prebuild/**/*"
+      - ".github/workflows/prebuild.yml"
+
+env:
+  PUBLISH_VERSION: ${{ github.sha }}
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: true
+      matrix:
+        os: ["ubuntu-latest", "windows-latest", "macos-latest"]
+        bin:
+          - name: "cargo-cache"
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run rake task
+        working-directory: prebuild
+        run: |
+          outdir="/tmp/oxidize-rb/prebuilt/${{ runner.os }}/bin"
+          mkdir -p $outdir
+          rake ${{ matrix.bin }} OS=${{ runner.os }} OUT_DIR=$outdir
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: prebuilt
+          path: /tmp/oxidize-rb/prebuilt/${{ runner.os }}
+          retention-days: 1
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: prebuilt
+          path: /tmp/oxidize-rb/prebuilt
+      - name: Tarball for each runner os
+        run: |
+          : Tarball for each runner os
+
+          ls -lar $os
+          mkdir -p /tmp/upload
+
+          for os in /tmp/oxidize-rb/prebuilt/*; do
+            tar -czf /tmp/upload/prebuilt-$(basename $os)-$PUBLISH_VERSION.tar.gz $os
+          done
+
+      - name: Create github release
+        uses: softprops/action-gh-release@v1
+        if: github.event_name == 'workflow_dispatch'
+        with:
+          tag_name: ${{ env.PUBLISH_VERSION }}
+          name: ${{ env.PUBLISH_VERSION }}
+          draft: true
+          prerelease: true
+          files: |
+            /tmp/oxidize-rb/prebuilt/**/*

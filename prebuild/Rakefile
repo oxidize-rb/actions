@@ -1,0 +1,24 @@
+desc "Build cargo cache and save the binary to $OUT_DIR"
+task 'cargo-cache' do
+  outdir = ENV.fetch('OUT_DIR', "tmp/prebuilt-local/bin")
+  root = File.dirname(outdir)
+  version = ENV["VERSION"] || "0.8.3"
+
+  puts "🧱 Building cargo-cache #{version} and saving to #{outdir}"
+
+  # check for cargo or else install it
+  unless system("cargo --version")
+    sh "curl https://sh.rustup.rs -sSf | sh -s -- -y --profile minimal"
+    ENV["PATH"] = "#{ENV["HOME"]}/.cargo/bin:#{ENV["PATH"]}"
+  end
+
+  sh <<~SH
+    cargo install --features ci-autoclean cargo-cache --root #{root} --version #{version}
+  SH
+
+  if File.exist?("#{outdir}/cargo-cache")
+    puts "✅ cargo-cache binary built and saved to #{outdir}"
+  else
+    abort "❌ cargo-cache binary not found in #{outdir}"
+  end
+end
