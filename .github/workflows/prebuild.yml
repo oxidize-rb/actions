@@ -18,16 +18,17 @@ jobs:
       fail-fast: true
       matrix:
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
-        bin:
+        dep:
           - name: "cargo-cache"
+            type: "bin"
     steps:
       - uses: actions/checkout@v3
       - name: Run rake task
         working-directory: prebuild
         run: |
-          outdir="/tmp/oxidize-rb/prebuilt/${{ runner.os }}/bin"
+          outdir="/tmp/oxidize-rb/prebuilt/${{ runner.os }}/${{ matrix.dep.type }}"
           mkdir -p $outdir
-          rake ${{ matrix.bin }} OS=${{ runner.os }} OUT_DIR=$outdir
+          rake ${{ matrix.dep.name }} OS=${{ runner.os }} OUT_DIR=$outdir
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
