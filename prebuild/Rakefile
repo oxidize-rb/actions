@@ -18,7 +18,7 @@ task 'cargo-cache' do
     cargo install --features ci-autoclean cargo-cache --root #{root} --version #{version}
   SH
 
-  if File.exist?(normalize_os_path(File.join(outdir, "cargo-cache")))
+  if File.exist?(normalize_os_path(outdir))
     puts "✅ cargo-cache binary built and saved to #{outdir}"
   else
     abort "❌ cargo-cache binary not found in #{outdir}"
