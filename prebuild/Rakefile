@@ -1,28 +1,24 @@
 # Add to path in cross platform way
-def add_to_path(path)
-  ENV["PATH"] = "#{path}#{File::PATH_SEPARATOR}#{ENV["PATH"]}"
+def normalize_os_path(path)
+  return path unless ENV.fetch("OS").match?(/windows/i)
+
+  path.gsub("/", "\\")
 end
 
 desc "Build cargo cache and save the binary to $OUT_DIR"
 task 'cargo-cache' do
   outdir = ENV.fetch('OUT_DIR', "tmp/prebuilt-local/bin")
-  outdir = File.join(*outdir.split("/"))
+  outdir = normalize_os_path(outdir)
   root = File.dirname(outdir)
   version = ENV["VERSION"] || "0.8.3"
 
   puts "🧱 Building cargo-cache #{version} and saving to #{outdir}"
 
-  # check for cargo or else install it
-  unless system("cargo --version")
-    sh "curl https://sh.rustup.rs -sSf | sh -s -- -y --profile minimal"
-    add_to_path(File.join(ENV["HOME"], ".cargo", "bin"))
-  end
-
   sh <<~SH
     cargo install --features ci-autoclean cargo-cache --root #{root} --version #{version}
   SH
 
-  if File.exist?(File.join(outdir, "cargo-cache"))
+  if File.exist?(normalize_os_path(File.join(outdir, "cargo-cache")))
     puts "✅ cargo-cache binary built and saved to #{outdir}"
   else
     abort "❌ cargo-cache binary not found in #{outdir}"
