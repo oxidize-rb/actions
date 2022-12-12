@@ -1,6 +1,12 @@
+# Add to path in cross platform way
+def add_to_path(path)
+  ENV["PATH"] = "#{path}#{File::PATH_SEPARATOR}#{ENV["PATH"]}"
+end
+
 desc "Build cargo cache and save the binary to $OUT_DIR"
 task 'cargo-cache' do
   outdir = ENV.fetch('OUT_DIR', "tmp/prebuilt-local/bin")
+  outdir = File.join(*outdir.split("/"))
   root = File.dirname(outdir)
   version = ENV["VERSION"] || "0.8.3"
 
@@ -9,7 +15,7 @@ task 'cargo-cache' do
   # check for cargo or else install it
   unless system("cargo --version")
     sh "curl https://sh.rustup.rs -sSf | sh -s -- -y --profile minimal"
-    ENV["PATH"] = "#{ENV["HOME"]}/.cargo/bin:#{ENV["PATH"]}"
+    add_to_path(File.join(ENV["HOME"], ".cargo", "bin"))
   end
 
   sh <<~SH
