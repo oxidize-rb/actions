@@ -49,9 +49,6 @@ inputs:
   debug:
     description: "Enable verbose debugging info (includes summary of action)"
     default: "false"
-  prefer-ruby-static:
-    description: "Prefer using libruby static if it's available"
-    default: "false"
 outputs:
   ruby-prefix:
     description: "The prefix of the installed ruby"
@@ -65,6 +62,23 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - name: Configure environment
+      shell: bash
+      run: |
+        : Configure environment
+        echo "::group::Configuring environment"
+
+        echo "CARGO_INCREMENTAL=0" >> $GITHUB_ENV
+        echo "RB_SYS_DOCK_UID=$(id -u)" >> $GITHUB_ENV
+        echo "RB_SYS_DOCK_GID=$(id -g)" >> $GITHUB_ENV
+        echo "RB_SYS_DOCK_CACHE_DIR=$HOME/.cache/rb-sys-dock" >> $GITHUB_ENV
+
+        if [ "${{ inputs.debug }}" = "true" ]; then
+          echo "::info::Setting debug mode"
+          echo "RB_SYS_DEBUG_BUILD=1" >> $GITHUB_ENV
+          echo "SCCACHE_LOG=debug" >> $GITHUB_ENV
+        fi
+
     - uses: "ruby/setup-ruby-pkgs@v1"
       if: inputs.ruby-version != 'none'
       with:
@@ -194,6 +208,7 @@ runs:
         path: |
           **/tmp/${{ steps.set-outputs.outputs.ruby-platform }}/
           ${{ inputs.cargo-cache-extra-path }}
+          ${{ env.RB_SYS_DOCK_CACHE_DIR }}
         restore-keys: |
           ${{ steps.set-outputs.outputs.ext-cache-key-level-2 }}
           ${{ steps.set-outputs.outputs.ext-cache-key-level-1 }}
@@ -216,23 +231,17 @@ runs:
           core.exportVariable('SCCACHE_C_CUSTOM_CACHE_BUSTER', '${{ inputs.cache-version }}-${{ steps.rust-toolchain.outputs.cachekey }}');
 
     - name: Install sccache
+      uses: oxidize-rb/actions/cargo-binstall@v1
+      if: steps.set-outputs.outputs.cargo-cache == 'sccache'
+      with:
+        crate: sccache
+        version: 0.3.3
+
+    - name: Install sccache
       if: steps.set-outputs.outputs.cargo-cache == 'sccache'
       shell: bash
       run: |
         : Setup sccache
-
-        if ! command -v sccache &> /dev/null; then
-          outpath="$(ruby -e 'puts File.join(ENV["HOME"], ".setup-ruby-and-rust", "bin")')"
-          mkdir -p "$outpath"
-          echo "$outpath" >> $GITHUB_PATH
-          pushd "$outpath"
-          version="v0.3.3"
-          toolchain="$(ruby --disable-gems $GITHUB_ACTION_PATH/helpers/derive_toolchain.rb --runner)"
-          filename="sccache-$version-$toolchain.tar.gz"
-          curl -L "https://github.com/mozilla/sccache/releases/download/$version/$filename" | tar -xz --strip-components=1
-          popd
-        fi
-
         cache_from="${{ steps.rust-toolchain.outputs.cachekey }}__${{ steps.derive-toolchain.outputs.toolchain }}"
         cache_to="${cache_from}__${GITHUB_SHA}"
 
@@ -266,38 +275,6 @@ runs:
         [ "${{ inputs.working-directory }}" != "" ] && pushd "${{ inputs.working-directory }}"
         mkdir -p .cargo tmp && cargo vendor "$PWD/tmp/cargo-vendor" >> .cargo/config.toml
         [ "${{ inputs.working-directory }}" != "" ] && popd
-        echo "::endgroup::"
-
-    - name: Configure environment
-      shell: bash
-      run: |
-        : Configure environment
-        echo "::group::Configuring environment"
-
-        echo "CARGO_INCREMENTAL=0" >> $GITHUB_ENV
-
-        if [ "${{ inputs.debug }}" = "true" ]; then
-          echo "::info::Setting debug mode"
-          echo "RB_SYS_DEBUG_BUILD=1" >> $GITHUB_ENV
-          echo "SCCACHE_LOG=debug" >> $GITHUB_ENV
-        fi
-
-
-        if [ "${{ inputs.prefer-ruby-static }}" = "true" ]; then
-          echo "::group::Attempting to configure static libruby"
-          libdir="$(rbconfig libdir)"
-          libruby_a=$(rbconfig LIBRUBY_A || echo notfound)
-          if [ -f "$libdir/$libruby_a" ]; then
-            echo "Found LIBRUBY_A in libdir"
-            echo "RUBY_STATIC=1" >> $GITHUB_ENV
-          else
-            echo "Could not find $libruby_a in libdir, files were:"
-            ls $libdir
-            echo "Current LIBRUBYARG_STATIC: $(rbconfig LIBRUBYARG_STATIC || echo unknown)"
-          fi
-          echo "::endgroup::"
-        fi
-
         echo "::endgroup::"
 
     - name: Configure bindgen
