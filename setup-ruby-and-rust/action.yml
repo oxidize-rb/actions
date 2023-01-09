@@ -105,6 +105,9 @@ runs:
         targets: ${{ inputs.rustup-targets }}
         components: ${{ inputs.rustup-components }}
 
+    - run: rustup toolchain list
+      shell: bash
+
     - name: Set outputs
       id: set-outputs
       shell: bash
@@ -226,12 +229,12 @@ runs:
         echo "SCCACHE_GHA_CACHE_FROM=$cache_from" >> $GITHUB_ENV
         echo "SCCACHE_GHA_CACHE_TO=$cache_to" >> $GITHUB_ENV
 
-    - name: Set Path for Ruby libdir (windows)
-      if: runner.os == 'Windows' && inputs.ruby-version != 'none'
-      shell: bash
-      run: |
-        echo "$Path"
-        echo "Path=\"$(rbconfig libdir | sed 's:/:\\:g');$Path\"" >> $GITHUB_ENV
+    # - name: Set Path for Ruby libdir (windows)
+    #   if: runner.os == 'Windows' && inputs.ruby-version != 'none'
+    #   shell: bash
+    #   run: |
+    #     echo "$Path"
+    #     echo "Path=\"$(rbconfig libdir | sed 's:/:\\:g');$Path\"" >> $GITHUB_ENV
 
     - name: Set LD_LIBRARY_PATH for Ruby (linux)
       if: runner.os == 'Linux' && inputs.ruby-version != 'none'
