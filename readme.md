@@ -22,3 +22,9 @@ A GitHub Action to query useful CI data for usage in a matrix, etc.
 A GitHub action to download and install binaries using `cargo-binstall`.
 
 [📝 Read the Docs](./cargo-binstall/readme.md)
+
+### `oxidize-rb/actions/post-run@v1`
+
+Simple action to run a command after a job has finished.
+
+[📝 Read the Docs](./post-run/readme.md)
