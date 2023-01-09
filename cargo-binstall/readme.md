@@ -26,10 +26,12 @@ jobs:
 
 <!-- inputs -->
 
-| Name        | Description             | Default |
-| ----------- | ----------------------- | ------- |
-| **crate**   | The crate to install.   |         |
-| **version** | The version to install. |         |
+| Name             | Description                       | Default   |
+| ---------------- | --------------------------------- | --------- |
+| **crate**        | The crate to install.             |           |
+| **install-path** | The path to install the crate to. | `default` |
+| **strategies**   | The strategies to use.            | `default` |
+| **version**      | The version to install.           |           |
 
 <!-- /inputs -->
 
