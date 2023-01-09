@@ -203,6 +203,13 @@ runs:
         run: cargo-cache --autoclean
         cwd: ${{ inputs.working-directory }}
 
+    - name: Install sccache
+      uses: oxidize-rb/actions/cargo-binstall@v1
+      if: steps.set-outputs.outputs.cargo-cache == 'sccache'
+      with:
+        crate: sccache
+        version: 0.3.3
+
     - name: Configure sccache
       if: steps.set-outputs.outputs.cargo-cache == 'sccache'
       uses: actions/github-script@v6
@@ -213,12 +220,6 @@ runs:
           core.exportVariable('RUSTC_WRAPPER', process.env.RUSTC_WRAPPER || 'sccache');
           core.exportVariable('SCCACHE_C_CUSTOM_CACHE_BUSTER', '${{ inputs.cache-version }}-${{ steps.rust-toolchain.outputs.cachekey }}');
 
-    - name: Install sccache
-      uses: oxidize-rb/actions/cargo-binstall@v1
-      if: steps.set-outputs.outputs.cargo-cache == 'sccache'
-      with:
-        crate: sccache
-        version: 0.3.3
 
     - name: Install sccache
       if: steps.set-outputs.outputs.cargo-cache == 'sccache'
