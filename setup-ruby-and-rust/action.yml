@@ -111,6 +111,7 @@ runs:
       run: |
         : Set outputs
         ruby_platform="$(rbconfig arch)"
+        ruby_version="$(rbconfig MAJOR).$(rbconfig MINOR).$(rbconfig TEENY)"
 
         echo "ruby-prefix=$(rbconfig prefix)" >> $GITHUB_OUTPUT
         echo "ruby-platform=$ruby_platform" >> $GITHUB_OUTPUT
@@ -122,7 +123,7 @@ runs:
         echo "base-cache-key-level-2=$base_cache_level_2" >> $GITHUB_OUTPUT
         echo "base-cache-key-level-3=$base_cache_level_3" >> $GITHUB_OUTPUT
 
-        ext_cache_level_1="${base_cache_level_1}__${{ hashFiles('**/extconf.rb') }}"``
+        ext_cache_level_1="${base_cache_level_1}__${ruby_version}_${{ hashFiles('**/extconf.rb') }}"``
         ext_cache_level_2="${ext_cache_level_1}__${{ hashFiles('**/Gemfile') }}"``
         ext_cache_level_3="${ext_cache_level_2}__${{ hashFiles('**/Gemfile.lock') }}"``
         echo "ext-cache-key-level-1=$ext_cache_level_1" >> $GITHUB_OUTPUT
@@ -189,7 +190,7 @@ runs:
       with:
         key: ${{ steps.set-outputs.outputs.ext-cache-key-level-3 }}
         path: |
-          **/tmp/${{ steps.set-outputs.outputs.ruby-platform }}/target/
+          **/tmp/${{ steps.set-outputs.outputs.ruby-platform }}/
           ${{ inputs.cargo-cache-extra-path }}
         restore-keys: |
           ${{ steps.set-outputs.outputs.ext-cache-key-level-2 }}
