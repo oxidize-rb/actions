@@ -57,8 +57,9 @@ def download_and_save(triple)
   ext = triple.include?("linux") ? "tgz" : "zip"
   url = "https://github.com/cargo-bins/cargo-binstall/releases/download/v#{CARGO_BINSTALL_VERSION}/cargo-binstall-#{triple}.#{ext}"
   filename = triple.include?("windows") ? "cargo-binstall.exe" : "cargo-binstall"
+  outfile = File.join(tmpdir, filename)
 
-  return "/usr/local/bin/#{filename}" if File.exist?("/usr/local/bin/#{filename}")
+  return outfile if File.exist?(outfile)
 
   puts("Downloading #{url}")
   response = nil
@@ -72,15 +73,16 @@ def download_and_save(triple)
 
   # Unzip on macOS
   if ext == "zip"
-    File.binwrite("/#{tmpdir}/cargo-binstall.zip", response.body)
-    system("unzip -p /#{tmpdir}/cargo-binstall.zip #{filename} > /usr/local/bin/#{filename}")
-    FileUtils.rm("/#{tmpdir}/cargo-binstall.zip")
+    zipfile = File.join(tmpdir, "cargo-binstall.zip")
+    File.binwrite(zipfile, response.body)
+    system("unzip -p #{zipfile} #{filename} > #{outfile}")
+    FileUtils.rm(zipfile)
   elsif ext == "tgz"
     content = pipe_command("tar xzf - -O", stdin: response.body)
-    File.binwrite("/usr/local/bin/#{filename}", content)
+    File.binwrite(outfile, content)
   end
 
-  ret = "/usr/local/bin/#{filename}"
+  ret = outfile
   File.chmod(0o755, ret)
   ret
 end
