@@ -34,7 +34,7 @@ runs:
         : Install
         echo "::group::Install crate"
 
-        args = "--no-confirm --force --secure"
+        args="--no-confirm --force --secure"
 
         if [ "${{ inputs.install-path }}" != "default" ]; then
           args="$args --install-path ${{ inputs.install-path }}"
