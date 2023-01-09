@@ -1,0 +1,35 @@
+---
+name: test-cargo-binstall
+on:
+  push:
+    paths:
+      - "cargo-binstall/**/*"
+      - ".github/workflows/test-fetch-ci-data.yml"
+    pull_request: {}
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: true
+      matrix: {os: [ubuntu-latest, macos-latest, windows-latest]}
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: ./cargo-binstall
+        id: cargo-binstall
+        with:
+          crate: cargo-cache
+          version: 0.8.3
+
+      - name: Run tests
+        shell: bash
+        run: |
+          if ! cargo-cache --version | grep -q "cargo-cache 0.8.3"; then
+            echo "cargo-cache 0.8.3 is not installed"
+            exit 1
+          fi
+
+          if [ "${{ steps.cargo-binstall.outputs.status }}" != "success" ]; then
+            echo "cargo-binstall failed"
+            exit 1
+          fi

@@ -1,0 +1,30 @@
+---
+name: "cargo-binstall"
+description: "A GitHub action to download and install binaries using `cargo-binstall`."
+author: "Ian Ker-Seymer"
+branding:
+  icon: "download-cloud"
+  color: "gray-dark"
+inputs:
+  crate:
+    description: "The crate to install."
+    required: true
+  version:
+    description: "The version to install."
+    required: true
+outputs:
+  status:
+    description: "The status of the installation."
+    value: ${{ steps.install.outputs.status }}
+runs:
+  using: "composite"
+  steps:
+    - name: Install
+      id: install
+      shell: bash
+      run: |
+        : Install
+        echo "::group::Install crate"
+        $GITHUB_ACTION_PATH/cargo-binstall ${{ inputs.crate }} --no-confirm --force --version ${{ inputs.version }} --strategies quick-install --secure
+        echo "::endgroup::"
+        echo "status=success" >> $GITHUB_OUTPUT

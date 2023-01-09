@@ -1,0 +1,113 @@
+#!/usr/bin/env ruby
+
+require "rbconfig"
+require "net/http"
+require "digest/sha2"
+require "fileutils"
+
+CARGO_BINSTALL_VERSION = "0.18.1"
+
+CHECKSUMS = {
+  "x86_64-apple-darwin" => "291ad8f69e3f31a620c17a68cb456f64ab736947a76c57ffcc6f8602a09b4cb5",
+  "x86_64-unknown-linux-musl" => "ef05f04e951665b617fe0796ec72e5dc51e8724ee0b09a0da129fa24162369a0",
+  "x86_64-pc-windows-msvc" => "bfc078cb22626bb80e1bb23a3cc74f4362c1326ec3f3dfc1cc46e1bd13528906",
+  "aarch64-apple-darwin" => "9ea261b7617bf6161447aa42b8e8979a7369aed3e5cef6b3774bec55fa4c70b6"
+}
+
+def infer_vendor
+  case RbConfig::CONFIG["host_os"]
+  when /linux/i
+    "unknown-linux-musl"
+  when /darwin/i
+    "apple-darwin"
+  when /mswin|mingw|cygwin/i
+    "pc-windows-msvc"
+  else
+    raise "Unsupported host OS: #{RbConfig::CONFIG["host_os"]}"
+  end
+end
+
+def infer_cpu
+  case RbConfig::CONFIG["host_cpu"]
+  when /x86_64/i, /x64/i
+    "x86_64"
+  when /aarch64/i, /arm64/i
+    "aarch64"
+  else
+    raise "Unsupported host CPU: #{RbConfig::CONFIG["host_cpu"]}"
+  end
+end
+
+def infer_target_triple
+  vendor = infer_vendor
+  cpu = infer_cpu
+
+  "#{cpu}-#{vendor}"
+end
+
+def tmpdir
+  return ENV["RUNNER_TEMP"] if ENV["RUNNER_TEMP"]
+
+  require "tmpdir"
+  @tmpdir ||= Dir.tmpdir
+end
+
+def download_and_save(triple)
+  checksum = CHECKSUMS.fetch(triple)
+  ext = triple.include?("linux") ? "tgz" : "zip"
+  url = "https://github.com/cargo-bins/cargo-binstall/releases/download/v#{CARGO_BINSTALL_VERSION}/cargo-binstall-#{triple}.#{ext}"
+  filename = triple.include?("windows") ? "cargo-binstall.exe" : "cargo-binstall"
+  outfile = File.join(tmpdir, filename)
+
+  return outfile if File.exist?(outfile)
+
+  puts("Downloading #{url}")
+  response = nil
+  begin
+    response = Net::HTTP.get_response(URI.parse(url))
+    url = response["location"]
+  end while response.is_a?(Net::HTTPRedirection)
+
+  raise "Checksum mismatch" unless Digest::SHA256.hexdigest(response.body) == checksum
+  puts("Verified checksum")
+
+  # Unzip on macOS
+  if ext == "zip"
+    zipfile = File.join(tmpdir, "cargo-binstall.zip")
+    File.binwrite(zipfile, response.body)
+    system("unzip -p #{zipfile} #{filename} > #{outfile}")
+    FileUtils.rm(zipfile)
+  elsif ext == "tgz"
+    content = pipe_command("tar xzf - -O", stdin: response.body)
+    File.binwrite(outfile, content)
+  end
+
+  ret = outfile
+  File.chmod(0o755, ret)
+  ret
+end
+
+def pipe_command(cmd, stdin:)
+  require "open3"
+
+  stdout_and_stderr_str, status = Open3.capture2e(cmd, stdin_data: stdin)
+
+  abort(stdout_and_stderr_str) unless status.success?
+
+  stdout_and_stderr_str
+end
+
+def install_cargo_binstall
+  puts("::group::Installing cargo-binstall")
+  target_triple = infer_target_triple
+  ret = download_and_save(target_triple)
+  puts("::endgroup::")
+  ret
+end
+
+def main
+  exe = install_cargo_binstall
+  exec(exe, *ARGV)
+end
+
+main

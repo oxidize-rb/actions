@@ -16,3 +16,9 @@ testing native Rust gems.
 A GitHub Action to query useful CI data for usage in a matrix, etc.
 
 [📝 Read the Docs](./fetch-ci-data/readme.md)
+
+### `oxidize-rb/cargo-binstall`
+
+A GitHub action to download and install binaries using `cargo-binstall`.
+
+[📝 Read the Docs](./cargo-binstall/readme.md)
