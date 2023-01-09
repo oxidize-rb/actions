@@ -129,6 +129,7 @@ runs:
         base_cache_level_1="${{ inputs.cache-version }}__${{ steps.rust-toolchain.outputs.cachekey }}__${ruby_platform}"
         base_cache_level_2="${base_cache_level_1}__${{ hashFiles('**/Cargo.toml') }}"
         base_cache_level_3="${base_cache_level_2}__${{ hashFiles('**/Cargo.lock') }}"
+
         echo "base-cache-key-level-1=$base_cache_level_1" >> $GITHUB_OUTPUT
         echo "base-cache-key-level-2=$base_cache_level_2" >> $GITHUB_OUTPUT
         echo "base-cache-key-level-3=$base_cache_level_3" >> $GITHUB_OUTPUT
