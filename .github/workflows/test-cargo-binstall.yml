@@ -5,7 +5,6 @@ on:
     paths:
       - "cargo-binstall/**/*"
       - ".github/workflows/test-fetch-ci-data.yml"
-    pull_request: {}
 jobs:
   test:
     runs-on: ${{ matrix.os }}

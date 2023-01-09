@@ -5,7 +5,6 @@ on:
     paths:
       - "fetch-ci-data/**/*"
       - ".github/workflows/test-fetch-ci-data.yml"
-    pull_request: {}
 jobs:
   test:
     runs-on: ubuntu-latest
