@@ -229,7 +229,7 @@ runs:
     - name: Set Path for Ruby libdir (windows)
       if: runner.os == 'Windows' && inputs.ruby-version != 'none'
       shell: bash
-      run: echo "$(rbconfig libdir)" >> $GITHUB_PATH
+      run: echo "Path=$(rbconfig libdir);$Path" >> $GITHUB_ENV
 
     - name: Set LD_LIBRARY_PATH for Ruby (linux)
       if: runner.os == 'Linux' && inputs.ruby-version != 'none'
