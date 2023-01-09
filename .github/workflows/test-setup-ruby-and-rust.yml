@@ -20,7 +20,7 @@ jobs:
             run: bundle exec rake
           - name: "matsadler/magnus"
             slug: magnus
-            ref: 855cc11a73e536083e37bb89d5e101a02a748150
+            ref: main
             run: cargo test
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
         rust: ["stable"]
