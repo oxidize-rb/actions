@@ -32,8 +32,6 @@ runs:
       shell: bash
       run: |
         : Install
-        echo "::group::Install crate"
-
         args="--no-confirm --force --secure --no-symlinks"
 
         if [ "${{ inputs.install-path }}" != "default" ]; then
@@ -45,5 +43,5 @@ runs:
         fi
 
         $GITHUB_ACTION_PATH/cargo-binstall ${{ inputs.crate }} --version ${{ inputs.version }} $args
-        echo "::endgroup::"
+
         echo "status=success" >> $GITHUB_OUTPUT
