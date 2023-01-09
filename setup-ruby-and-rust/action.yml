@@ -62,23 +62,6 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: Configure environment
-      shell: bash
-      run: |
-        : Configure environment
-        echo "::group::Configuring environment"
-
-        echo "CARGO_INCREMENTAL=0" >> $GITHUB_ENV
-        echo "RB_SYS_DOCK_UID=$(id -u)" >> $GITHUB_ENV
-        echo "RB_SYS_DOCK_GID=$(id -g)" >> $GITHUB_ENV
-        echo "RB_SYS_DOCK_CACHE_DIR=$HOME/.cache/rb-sys-dock" >> $GITHUB_ENV
-
-        if [ "${{ inputs.debug }}" = "true" ]; then
-          echo "::info::Setting debug mode"
-          echo "RB_SYS_DEBUG_BUILD=1" >> $GITHUB_ENV
-          echo "SCCACHE_LOG=debug" >> $GITHUB_ENV
-        fi
-
     - uses: "ruby/setup-ruby-pkgs@v1"
       if: inputs.ruby-version != 'none'
       with:
@@ -270,7 +253,7 @@ runs:
       if: inputs.cargo-vendor == 'true'
       shell: bash
       run: |
-        : Vendor carogo dependencies
+        : Vendor cargo dependencies
         echo "::group::Vendoring cargo deps"
         [ "${{ inputs.working-directory }}" != "" ] && pushd "${{ inputs.working-directory }}"
         mkdir -p .cargo tmp && cargo vendor "$PWD/tmp/cargo-vendor" >> .cargo/config.toml
@@ -283,3 +266,21 @@ runs:
       run: |
         echo "LIBCLANG_PATH=$((gcm clang).source -replace "clang.exe")" >> $env:GITHUB_ENV
         echo "BINDGEN_EXTRA_CLANG_ARGS=$((gcm clang).source -replace "bin\clang.exe","include")" >> $env:GITHUB_ENV
+
+    - name: Configure environment
+      shell: bash
+      run: |
+        : Configure environment
+        echo "::group::Configuring environment"
+
+        echo "CARGO_INCREMENTAL=0" >> $GITHUB_ENV
+        echo "RB_SYS_DOCK_UID=$(id -u)" >> $GITHUB_ENV
+        echo "RB_SYS_DOCK_GID=$(id -g)" >> $GITHUB_ENV
+        echo "RB_SYS_DOCK_CACHE_DIR=$HOME/.cache/rb-sys-dock" >> $GITHUB_ENV
+
+        if [ "${{ inputs.debug }}" = "true" ]; then
+          echo "::info::Setting debug mode"
+          echo "RB_SYS_DEBUG_BUILD=1" >> $GITHUB_ENV
+          echo "SCCACHE_LOG=debug" >> $GITHUB_ENV
+        fi
+
