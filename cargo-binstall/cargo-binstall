@@ -47,7 +47,7 @@ end
 
 def download_and_save(triple)
   checksum = CHECKSUMS.fetch(triple)
-  ext = triple.include?("apple-darwin") ? "zip" : "tgz"
+  ext = triple.include?("linux") ? "tgz" : "zip"
   url = "https://github.com/cargo-bins/cargo-binstall/releases/download/v#{CARGO_BINSTALL_VERSION}/cargo-binstall-#{triple}.#{ext}"
   puts("Downloading #{url}")
   response = nil
