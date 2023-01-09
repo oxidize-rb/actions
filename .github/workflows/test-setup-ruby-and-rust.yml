@@ -75,7 +75,7 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby }}
           rustup-toolchain: ${{ matrix.rust }}
-          cache-version: v0
+          cache-version: v1-${{ matrix.slug }}
           bundler-cache: true
           cargo-cache: ${{ matrix.cargo-cache }}
           cargo-cache-clean: true
