@@ -1,0 +1,22 @@
+---
+name: "CI"
+on:
+  - push
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: "Check readmes are up to date"
+        run: |
+          rake readme
+
+          if git diff --exit-code; then
+            echo "✅ readmes up to date"
+            git reset --hard HEAD
+          else
+            echo "❌ readmes not up to date, run `rake readme` and commit the changes"
+            exit 1
+          fi

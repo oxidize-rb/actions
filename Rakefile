@@ -19,7 +19,7 @@ def generate_table(action, replace_key, defaults)
     lines << "| #{cols.join(" | ")} |"
   end
 
-  action_path = action.sub(/action\.yml$/, "README.md")
+  action_path = action.sub(/action\.yml$/, "readme.md")
   readme = File.read(action_path)
   readme.sub!(/<!-- #{replace_key} -->.*<!-- \/#{replace_key} -->/m, "<!-- #{replace_key} -->\n#{lines.join("\n")}\n<!-- /#{replace_key} -->")
   File.write(action_path, readme)
@@ -30,7 +30,7 @@ task :readme do
     generate_table(action, "inputs", true)
     generate_table(action, "outputs", false)
 
-    action_path = action.sub(/action\.yml$/, "README.md")
-    system("npx prettier --write #{action_path}")
+    action_path = action.sub(/action\.yml$/, "readme.md")
+    sh("npx prettier --write #{action_path}")
   end
 end
