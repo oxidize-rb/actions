@@ -105,8 +105,18 @@ runs:
         targets: ${{ inputs.rustup-targets }}
         components: ${{ inputs.rustup-components }}
 
-    - run: rustup toolchain list
+    - name: Clean out alternative Windows toolchains (to avoid compiler conflicts)
       shell: bash
+      if: runner.os == 'Windows'
+      run: |
+        IFS=$'\n\t'
+
+        for toolchain in $(rustup toolchain list); do
+          if [[ "$toolchain" != *"default"* ]]; then
+            echo "Uninstalling $toolchain"
+            rustup toolchain uninstall "$toolchain"
+          fi
+        done
 
     - name: Set outputs
       id: set-outputs
