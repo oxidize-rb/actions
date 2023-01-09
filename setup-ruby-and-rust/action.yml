@@ -152,12 +152,14 @@ runs:
         fi
 
     - name: Install cargo-cache
-      uses: oxidize-rb/actions/cargo-binstall@v1
+      uses: oxidize-rb/actions/cargo-binstall@env-config-rb-sys-dock
       id: install-cargo-cache
       if: inputs.cargo-cache-clean == 'true' && steps.set-outputs.outputs.cargo-cache == 'tarball'
       with:
         crate: cargo-cache
         version: 0.8.3
+        strategies: quick-install
+        install-path: ${{ github.action_path }}/bin
 
     - name: Cargo registry cache
       uses: actions/cache@v3
@@ -204,11 +206,13 @@ runs:
         cwd: ${{ inputs.working-directory }}
 
     - name: Install sccache
-      uses: oxidize-rb/actions/cargo-binstall@v1
+      uses: oxidize-rb/actions/cargo-binstall@env-config-rb-sys-dock
       if: steps.set-outputs.outputs.cargo-cache == 'sccache'
       with:
         crate: sccache
         version: 0.3.3
+        strategies: quick-install
+        install-path: ${{ github.action_path }}/bin
 
     - name: Configure sccache
       if: steps.set-outputs.outputs.cargo-cache == 'sccache'
