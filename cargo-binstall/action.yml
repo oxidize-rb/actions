@@ -15,7 +15,7 @@ inputs:
 outputs:
   status:
     description: "The status of the installation."
-    value: ${{ steps.install.outputs.result }}
+    value: ${{ steps.install.outputs.status }}
 runs:
   using: "composite"
   steps:
