@@ -1,0 +1,20 @@
+---
+name: "CI"
+on:
+  - push
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: "Check readme is up to date"
+        run: |
+          rake readme
+
+          if git diff --exit-code; then
+            echo "README.md is not up to date"
+            exit 1
+          else
+            git reset --hard HEAD
+          fi
