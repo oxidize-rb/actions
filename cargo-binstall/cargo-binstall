@@ -45,10 +45,21 @@ def infer_target_triple
   "#{cpu}-#{vendor}"
 end
 
+def tmpdir
+  return ENV["RUNNER_TEMP"] if ENV["RUNNER_TEMP"]
+
+  require "tmpdir"
+  @tmpdir ||= Dir.tmpdir
+end
+
 def download_and_save(triple)
   checksum = CHECKSUMS.fetch(triple)
   ext = triple.include?("linux") ? "tgz" : "zip"
   url = "https://github.com/cargo-bins/cargo-binstall/releases/download/v#{CARGO_BINSTALL_VERSION}/cargo-binstall-#{triple}.#{ext}"
+  filename = triple.include?("windows") ? "cargo-binstall.exe" : "cargo-binstall"
+
+  return "/usr/local/bin/#{filename}" if File.exist?("/usr/local/bin/#{filename}")
+
   puts("Downloading #{url}")
   response = nil
   begin
@@ -57,19 +68,21 @@ def download_and_save(triple)
   end while response.is_a?(Net::HTTPRedirection)
 
   raise "Checksum mismatch" unless Digest::SHA256.hexdigest(response.body) == checksum
-  puts("Verified checksum for #{url}")
+  puts("Verified checksum")
 
   # Unzip on macOS
   if ext == "zip"
-    File.binwrite("/tmp/cargo-binstall.zip", response.body)
-    system("unzip -p /tmp/cargo-binstall.zip cargo-binstall > /usr/local/bin/cargo-binstall")
-    FileUtils.rm("/tmp/cargo-binstall.zip")
+    File.binwrite("/#{tmpdir}/cargo-binstall.zip", response.body)
+    system("unzip -p /#{tmpdir}/cargo-binstall.zip #{filename} > /usr/local/bin/#{filename}")
+    FileUtils.rm("/#{tmpdir}/cargo-binstall.zip")
   elsif ext == "tgz"
     content = pipe_command("tar xzf - -O", stdin: response.body)
-    File.binwrite("/usr/local/bin/cargo-binstall", content)
+    File.binwrite("/usr/local/bin/#{filename}", content)
   end
 
-  File.chmod(0755, "/usr/local/bin/cargo-binstall")
+  ret = "/usr/local/bin/#{filename}"
+  File.chmod(0o755, ret)
+  ret
 end
 
 def pipe_command(cmd, stdin:)
@@ -85,14 +98,14 @@ end
 def install_cargo_binstall
   puts("::group::Installing cargo-binstall")
   target_triple = infer_target_triple
-  download_and_save(target_triple)
+  ret = download_and_save(target_triple)
   puts("::endgroup::")
+  ret
 end
 
 def main
-  install_cargo_binstall unless File.exist?("/usr/local/bin/cargo-binstall")
-
-  exec("/usr/local/bin/cargo-binstall", *ARGV)
+  exe = install_cargo_binstall
+  exec(exe, *ARGV)
 end
 
 main
