@@ -31,6 +31,6 @@ task :readme do
     generate_table(action, "outputs", false)
 
     action_path = action.sub(/action\.yml$/, "readme.md")
-    system("npx prettier --write #{action_path}")
+    sh("npx prettier --write #{action_path}")
   end
 end
