@@ -61,7 +61,6 @@ namespace :release do
     sh "git commit -m 'Bump to #{new_version}'"
     sh "git tag v#{new_version}"
     sh "git tag -f v#{major}"
-    sh "git tag #{new_version}"
     sh "git push"
     sh "git push --tags --force"
   end
