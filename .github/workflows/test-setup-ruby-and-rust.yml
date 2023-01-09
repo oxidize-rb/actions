@@ -9,7 +9,7 @@ env:
   SCCACHE_LOG: debug
 jobs:
   test:
-    name: ${{ runner.os }} ${{ matrix.repo.slug }} (ruby=${{ matrix.ruby }} cache=${{ matrix.cargo-cache }})
+    name: ${{ matrix.os }} ${{ matrix.repo.slug }} (ruby=${{ matrix.ruby }} cache=${{ matrix.cargo-cache }})
     strategy:
       fail-fast: false
       matrix:
