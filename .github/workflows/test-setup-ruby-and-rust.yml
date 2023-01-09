@@ -9,7 +9,7 @@ env:
   SCCACHE_LOG: debug
 jobs:
   test:
-    name: ${{ matrix.os }} ${{ matrix.repo.slug }} ${{ matrix.ruby }} ${{ matrix.cargo-cache }}
+    name: ${{ matrix.os }} ${{ matrix.repo.slug }} (ruby=${{ matrix.ruby }} cache=${{ matrix.cargo-cache }})
     strategy:
       fail-fast: false
       matrix:
@@ -52,6 +52,7 @@ jobs:
             cargo-cache: "true"
             repo:
               name: "matsadler/magnus"
+              slug: magnus
               ref: main
               run: cargo test
 
@@ -75,7 +76,7 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby }}
           rustup-toolchain: ${{ matrix.rust }}
-          cache-version: v1-${{ matrix.slug }}
+          cache-version: v1-${{ matrix.repo.slug }}
           bundler-cache: true
           cargo-cache: ${{ matrix.cargo-cache }}
           cargo-cache-clean: true

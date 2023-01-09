@@ -54,7 +54,6 @@ jobs:
 | **cargo-cache-extra-path** | Paths to cache for cargo and gem compilation                                                                                                                |                   |
 | **cargo-vendor**           | Vendor cargo dependencies to avoid repeated downloads                                                                                                       | `false`           |
 | **debug**                  | Enable verbose debugging info (includes summary of action)                                                                                                  | `false`           |
-| **prefer-ruby-static**     | Prefer using libruby static if it's available                                                                                                               | `false`           |
 | **ruby-version**           | Engine and version to use, see the syntax in the README. Reads from .ruby-version or .tool-versions if unset. Can be set to 'none' to skip installing Ruby. | `default`         |
 | **rubygems**               | Runs `gem update --system`. See https://github.com/ruby/setup-ruby/blob/master/README.md for more info.                                                     | `default`         |
 | **rustup-components**      | Comma-separated string of additional components to install e.g. clippy, rustfmt                                                                             | `clippy, rustfmt` |

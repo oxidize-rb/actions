@@ -12,6 +12,14 @@ inputs:
   version:
     description: "The version to install."
     required: true
+  install-path:
+    description: "The path to install the crate to."
+    required: false
+    default: default
+  strategies:
+    description: "The strategies to use."
+    required: false
+    default: default
 outputs:
   status:
     description: "The status of the installation."
@@ -24,7 +32,16 @@ runs:
       shell: bash
       run: |
         : Install
-        echo "::group::Install crate"
-        $GITHUB_ACTION_PATH/cargo-binstall ${{ inputs.crate }} --no-confirm --force --version ${{ inputs.version }} --strategies quick-install --secure
-        echo "::endgroup::"
+        args="--no-confirm --force --secure --no-symlinks"
+
+        if [ "${{ inputs.install-path }}" != "default" ]; then
+          args="$args --install-path ${{ inputs.install-path }}"
+        fi
+
+        if [ "${{ inputs.strategies }}" != "default" ]; then
+          args="$args --strategies ${{ inputs.strategies }}"
+        fi
+
+        $GITHUB_ACTION_PATH/cargo-binstall ${{ inputs.crate }} --version ${{ inputs.version }} $args
+
         echo "status=success" >> $GITHUB_OUTPUT
