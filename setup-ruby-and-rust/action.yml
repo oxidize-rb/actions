@@ -141,24 +141,13 @@ runs:
           echo "cargo-cache=${{ inputs.cargo-cache }}" >> $GITHUB_OUTPUT
         fi
 
-    - name: Cache the "cargo-cache" executable
-      uses: actions/cache@v3
-      if: inputs.cargo-cache-clean == 'true' && steps.set-outputs.outputs.cargo-cache == 'tarball'
-      with:
-        path: ~/.setup-ruby-and-rust/bin/cargo-cache
-        key: ${{ steps.set-outputs.outputs.ruby-platform }}-cargo-cache-clean-0.8.3
-
     - name: Install cargo-cache
+      uses: oxidize-rb/actions/cargo-binstall@main
       id: install-cargo-cache
       if: inputs.cargo-cache-clean == 'true' && steps.set-outputs.outputs.cargo-cache == 'tarball'
-      shell: bash
-      run: |
-        : Setup cargo-cache
-        if [ ! -f "$HOME/.setup-ruby-and-rust/bin/cargo-cache" ]; then
-          cargo install --features ci-autoclean cargo-cache --root "$HOME/.setup-ruby-and-rust" --version 0.8.3
-        fi
-
-        echo "$HOME/.setup-ruby-and-rust/bin" >> $GITHUB_PATH
+      with:
+        crate: cargo-cache
+        version: 0.8.3
 
     - name: Cargo registry cache
       uses: actions/cache@v3
