@@ -4,11 +4,12 @@ on:
   - push
 jobs:
   lint:
+    name: Lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
-      - name: "Check readme is up to date"
+      - name: "Check readmes are up to date"
         run: |
           rake readme
 
