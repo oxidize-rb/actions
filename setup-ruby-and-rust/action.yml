@@ -155,7 +155,7 @@ runs:
         fi
 
     - name: Install cargo-cache
-      uses: oxidize-rb/actions/cargo-binstall@main
+      uses: oxidize-rb/actions/cargo-binstall@v1
       id: install-cargo-cache
       if: inputs.cargo-cache-clean == 'true' && steps.set-outputs.outputs.cargo-cache == 'tarball'
       with:
@@ -200,7 +200,7 @@ runs:
 
     - name: Clean the cargo cache
       if: inputs.cargo-cache-clean == 'true' && steps.set-outputs.outputs.cargo-cache == 'tarball'
-      uses: oxidize-rb/actions/post-run@main
+      uses: oxidize-rb/actions/post-run@v1
       with:
         run: cargo-cache --autoclean
         cwd: ${{ inputs.working-directory }}

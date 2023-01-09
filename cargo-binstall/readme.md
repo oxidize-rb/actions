@@ -16,7 +16,7 @@ jobs:
     name: Install Wasmtime
     runs-on: ubuntu-latest
     steps:
-      - uses: "oxidize-rb/actions/cargo-binstall@main"
+      - uses: "oxidize-rb/actions/cargo-binstall@v1"
         with:
           name: "wasmtime-cli"
           version: "4.0.0"
