@@ -151,6 +151,28 @@ runs:
           echo "cargo-cache=${{ inputs.cargo-cache }}" >> $GITHUB_OUTPUT
         fi
 
+    - name: Configure environment
+      shell: bash
+      run: |
+        : Configure environment
+        echo "::group::Configuring environment"
+
+        echo "CARGO_INCREMENTAL=0" >> $GITHUB_ENV
+
+        echo "RB_SYS_DOCK_UID=$(id -u)" >> $GITHUB_ENV
+        echo "RB_SYS_DOCK_GID=$(id -g)" >> $GITHUB_ENV
+        rb_sys_dock_cache_dir="$HOME/.cache/rb-sys-dock"
+        mkdir -p "$rb_sys_dock_cache_dir"
+        echo "RB_SYS_DOCK_CACHE_DIR=$rb_sys_dock_cache_dir" >> $GITHUB_ENV
+
+        echo "RUBY_VERSION=$(rbconfig ruby_version)" >> $GITHUB_ENV
+
+        if [ "${{ inputs.debug }}" = "true" ]; then
+          echo "::info::Setting debug mode"
+          echo "RB_SYS_DEBUG_BUILD=1" >> $GITHUB_ENV
+          echo "SCCACHE_LOG=debug" >> $GITHUB_ENV
+        fi
+
     - name: Install cargo-cache
       uses: oxidize-rb/actions/cargo-binstall@v1
       id: install-cargo-cache
@@ -271,25 +293,3 @@ runs:
       run: |
         echo "LIBCLANG_PATH=$((gcm clang).source -replace "clang.exe")" >> $env:GITHUB_ENV
         echo "BINDGEN_EXTRA_CLANG_ARGS=$((gcm clang).source -replace "bin\clang.exe","include")" >> $env:GITHUB_ENV
-
-    - name: Configure environment
-      shell: bash
-      run: |
-        : Configure environment
-        echo "::group::Configuring environment"
-
-        echo "CARGO_INCREMENTAL=0" >> $GITHUB_ENV
-
-        echo "RB_SYS_DOCK_UID=$(id -u)" >> $GITHUB_ENV
-        echo "RB_SYS_DOCK_GID=$(id -g)" >> $GITHUB_ENV
-        rb_sys_dock_cache_dir="$HOME/.cache/rb-sys-dock"
-        mkdir -p "$rb_sys_dock_cache_dir"
-        echo "RB_SYS_DOCK_CACHE_DIR=$rb_sys_dock_cache_dir" >> $GITHUB_ENV
-
-        echo "RUBY_VERSION=$(rbconfig ruby_version)" >> $GITHUB_ENV
-
-        if [ "${{ inputs.debug }}" = "true" ]; then
-          echo "::info::Setting debug mode"
-          echo "RB_SYS_DEBUG_BUILD=1" >> $GITHUB_ENV
-          echo "SCCACHE_LOG=debug" >> $GITHUB_ENV
-        fi
