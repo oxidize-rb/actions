@@ -9,7 +9,7 @@ env:
   SCCACHE_LOG: debug
 jobs:
   test:
-    name: Testing ${{ matrix.repo.slug }}
+    name: Testing ${{ matrix.repo.slug }} on ${{ matrix.ruby-platform }}
     strategy:
       fail-fast: false
       matrix:
