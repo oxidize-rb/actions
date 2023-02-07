@@ -1,0 +1,65 @@
+---
+name: "Cross Gem"
+description: "A GitHub action to cross-compile a Ruby gem for multiple platforms using `rb-sys-dock`."
+author: "Ian Ker-Seymer"
+branding:
+  icon: "download-cloud"
+  color: "gray-dark"
+inputs:
+  platform:
+    description: "The platform to cross-compile for (e.g. `x86_64-linux`)"
+    required: true
+  ruby-versions:
+    description: "The Ruby versions to cross-compile for (e.g. `2.7,3.0,3.1`)"
+    required: true
+  cache-version:
+    default: "v0"
+    description: "Arbitrary string that will be added to the cache key of the bundler cache. Set or change it if you need to invalidate the cache."
+  working-directory:
+    default: "."
+    description: "The working directory to run the action in."
+outputs:
+  gem-path:
+    description: "The path to the cross-compiled gem"
+    value: ${{ steps.set-outputs.outputs.gem-path }}
+runs:
+  using: "composite"
+  steps:
+    - name: Configure environment
+      shell: bash
+      run: |
+        : Configure environment
+        echo "RB_SYS_DOCK_UID=$(id -u)" >> $GITHUB_ENV
+        echo "RB_SYS_DOCK_GID=$(id -g)" >> $GITHUB_ENV
+        rb_sys_dock_cache_dir="$HOME/.cache/rb-sys-dock"
+        mkdir -p "$rb_sys_dock_cache_dir"
+        echo "RB_SYS_DOCK_CACHE_DIR=$rb_sys_dock_cache_dir" >> $GITHUB_ENV
+
+    - name: Setup caching
+      uses: actions/cache@v3
+      with:
+        path: |
+          ${{ env.RB_SYS_DOCK_CACHE_DIR }}
+          ${{ inputs.working-directory }}/tmp/rb-sys-dock/${{ inputs.platform }}/target
+        key: rb-sys-dock-${{ inputs.cache-version }}-${{ inputs.platform }}-${{ hashFiles('**/Gemfile.lock', '**/Cargo.lock') }}
+        restore-keys: |
+          rb-sys-dock-${{ inputs.cache-version }}-${{ inputs.platform }}-
+
+    - name: Build gem
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        : Compile gem
+        if bundle info rb_sys > /dev/null; then
+          bundle exec rb-sys-dock --platform "${{ inputs.platform }}" --ruby-versions "${{ inputs.ruby-versions }}" --build
+        else
+          gem install rb_sys
+          rb-sys-dock --platform "${{ inputs.platform }}" --ruby-versions "${{ inputs.ruby-versions }}" --build
+        fi
+
+    - name: Set outputs
+      id: set-outputs
+      shell: bash
+      run: |
+        : Set output
+        echo "gem-path=$(find ${{ inputs.working-directory }}/pkg -name '*-${{ inputs.platform }}.gem')" >> $GITHUB_OUTPUT
