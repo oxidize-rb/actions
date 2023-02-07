@@ -133,13 +133,7 @@ runs:
         echo "base-cache-key-level-2=$base_cache_level_2" >> $GITHUB_OUTPUT
         echo "base-cache-key-level-3=$base_cache_level_3" >> $GITHUB_OUTPUT
 
-        ext_cache_level_1="${base_cache_level_1}__${{ hashFiles('**/extconf.rb') }}"
-        ext_cache_level_2="${ext_cache_level_1}__${{ hashFiles('**/Gemfile') }}"
-        ext_cache_level_3="${ext_cache_level_2}__${{ hashFiles('**/Gemfile.lock') }}"
-        echo "ext-cache-key-level-1=$ext_cache_level_1" >> $GITHUB_OUTPUT
-        echo "ext-cache-key-level-2=$ext_cache_level_2" >> $GITHUB_OUTPUT
-        echo "ext-cache-key-level-3=$ext_cache_level_3" >> $GITHUB_OUTPUT
-        echo "cache-key=$ext_cache_level_3" >> $GITHUB_OUTPUT
+        echo "cache-key=$base_cache_level_3" >> $GITHUB_OUTPUT
 
         ruby --disable-gems $GITHUB_ACTION_PATH/helpers/cargo_registry_cache_keys.rb
 
@@ -158,12 +152,6 @@ runs:
         echo "::group::Configuring environment"
 
         echo "CARGO_INCREMENTAL=0" >> $GITHUB_ENV
-
-        echo "RB_SYS_DOCK_UID=$(id -u)" >> $GITHUB_ENV
-        echo "RB_SYS_DOCK_GID=$(id -g)" >> $GITHUB_ENV
-        rb_sys_dock_cache_dir="$HOME/.cache/rb-sys-dock"
-        mkdir -p "$rb_sys_dock_cache_dir"
-        echo "RB_SYS_DOCK_CACHE_DIR=$rb_sys_dock_cache_dir" >> $GITHUB_ENV
 
         echo "RUBY_VERSION=$(rbconfig ruby_version)" >> $GITHUB_ENV
 
@@ -206,19 +194,6 @@ runs:
         restore-keys: |
           ${{ steps.set-outputs.outputs.base-cache-key-level-2 }}
           ${{ steps.set-outputs.outputs.base-cache-key-level-1 }}
-
-    - name: Setup ext cargo cache
-      uses: actions/cache@v3
-      if: steps.set-outputs.outputs.cargo-cache == 'tarball'
-      with:
-        key: ${{ steps.set-outputs.outputs.ext-cache-key-level-3 }}
-        path: |
-          **/tmp/${{ steps.set-outputs.outputs.ruby-platform }}/
-          ${{ inputs.cargo-cache-extra-path }}
-          ${{ env.RB_SYS_DOCK_CACHE_DIR }}
-        restore-keys: |
-          ${{ steps.set-outputs.outputs.ext-cache-key-level-2 }}
-          ${{ steps.set-outputs.outputs.ext-cache-key-level-1 }}
 
     - name: Clean the cargo cache
       if: inputs.cargo-cache-clean == 'true' && steps.set-outputs.outputs.cargo-cache == 'tarball'

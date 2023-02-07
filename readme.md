@@ -11,6 +11,13 @@ testing native Rust gems.
 
 [📝 Read the Docs](./setup-ruby-and-rust/readme.md)
 
+### `oxidize-rb/actions/cross-gem@v1`
+
+A GitHub action to cross-compile a Ruby gem for multiple platforms using
+`rb-sys-dock`.
+
+[📝 Read the Docs](./cross-gem/readme.md)
+
 ### `oxidize-rb/actions/fetch-ci-data@v1`
 
 A GitHub Action to query useful CI data for usage in a matrix, etc.

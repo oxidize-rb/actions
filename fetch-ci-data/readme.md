@@ -46,15 +46,6 @@ name: Test
 on: push
 
 jobs:
-
-  test:
-    name: Test on Ruby ${{ matrix.ruby }}
-    needs: ci-data
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-jobs:
   ci-data:
     runs-on: ubuntu-latest
     outputs:
@@ -78,12 +69,12 @@ jobs:
 
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.1'
+          ruby-version: "3.1"
 
       - uses: oxidize-rb/cross-gem-action@v7
         with:
           platform: ${{ matrix.platform }}
-          ruby-versions: '3.1, 3.0, 2.7' # optional
+          ruby-versions: "3.1, 3.0, 2.7" # optional
 
       - uses: actions/download-artifact@v3
         with:
