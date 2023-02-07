@@ -50,7 +50,12 @@ runs:
       working-directory: ${{ inputs.working-directory }}
       run: |
         : Compile gem
-        bundle exec rb-sys-dock --platform "${{ inputs.platform }}" --ruby-versions "${{ inputs.ruby-versions }}" --build
+        if bundle info rb_sys > /dev/null; then
+          bundle exec rb-sys-dock --platform "${{ inputs.platform }}" --ruby-versions "${{ inputs.ruby-versions }}" --build
+        else
+          gem install rb_sys
+          rb-sys-dock --platform "${{ inputs.platform }}" --ruby-versions "${{ inputs.ruby-versions }}" --build
+        fi
 
     - name: Set outputs
       id: set-outputs
