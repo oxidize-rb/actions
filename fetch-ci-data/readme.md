@@ -90,11 +90,11 @@ jobs:
 
 <!-- inputs -->
 
-| Name                         | Description                                                               | Default |
-| ---------------------------- | ------------------------------------------------------------------------- | ------- |
-| **stable-ruby-versions**     | List non-EOF Ruby versions                                                | `true`  |
-| **supported-ruby-platforms** | List all supported cross-platforms (can exclude items with YAML argument) | `true`  |
-| **supported-rust-targets**   | List all supported Rust targets (can exclude items with YAML argument)    | `true`  |
+| Name                         | Description                                                               | Required | Default |
+| ---------------------------- | ------------------------------------------------------------------------- | -------- | ------- |
+| **stable-ruby-versions**     | List non-EOF Ruby versions                                                | No       | `true`  |
+| **supported-ruby-platforms** | List all supported cross-platforms (can exclude items with YAML argument) | No       | `true`  |
+| **supported-rust-targets**   | List all supported Rust targets (can exclude items with YAML argument)    | No       | `true`  |
 
 <!-- /inputs -->
 
@@ -102,8 +102,8 @@ jobs:
 
 <!-- outputs -->
 
-| Name       | Description                                                                      |
-| ---------- | -------------------------------------------------------------------------------- |
-| **result** | Result of the query (i.e. `{"stable-ruby-versions":["2.7","3.0","3.1","head"]}`) |
+| Name       | Description                                                                      | Required |
+| ---------- | -------------------------------------------------------------------------------- | -------- |
+| **result** | Result of the query (i.e. `{"stable-ruby-versions":["2.7","3.0","3.1","head"]}`) | No       |
 
 <!-- /outputs -->

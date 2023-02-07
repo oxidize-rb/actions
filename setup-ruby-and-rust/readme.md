@@ -45,21 +45,21 @@ jobs:
 
 <!-- inputs -->
 
-| Name                       | Description                                                                                                                                                 | Default           |
-| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
-| **bundler-cache**          | Run "bundle install", and cache the result automatically. Either true or false.                                                                             | `false`           |
-| **cache-version**          | Arbitrary string that will be added to the cache key of the bundler cache. Set or change it if you need to invalidate the cache.                            | `v0`              |
-| **cargo-cache**            | Strategy to use for caching build artifacts (either 'sccache', 'tarball', or 'false')                                                                       | `default`         |
-| **cargo-cache-clean**      | Clean the cargo cache with cargo cache --autoclean                                                                                                          | `true`            |
-| **cargo-cache-extra-path** | Paths to cache for cargo and gem compilation                                                                                                                |                   |
-| **cargo-vendor**           | Vendor cargo dependencies to avoid repeated downloads                                                                                                       | `false`           |
-| **debug**                  | Enable verbose debugging info (includes summary of action)                                                                                                  | `false`           |
-| **ruby-version**           | Engine and version to use, see the syntax in the README. Reads from .ruby-version or .tool-versions if unset. Can be set to 'none' to skip installing Ruby. | `default`         |
-| **rubygems**               | Runs `gem update --system`. See https://github.com/ruby/setup-ruby/blob/master/README.md for more info.                                                     | `default`         |
-| **rustup-components**      | Comma-separated string of additional components to install e.g. clippy, rustfmt                                                                             | `clippy, rustfmt` |
-| **rustup-targets**         | Comma-separated string of additional targets to install e.g. wasm32-unknown-unknown                                                                         |                   |
-| **rustup-toolchain**       | Rustup toolchain specifier e.g. stable, nightly, 1.42.0, nightly-2022-01-01.                                                                                | `stable`          |
-| **working-directory**      | The working directory to use for resolving paths for .ruby-version, .tool-versions and Gemfile.lock.                                                        |                   |
+| Name                       | Description                                                                                                                                                 | Required | Default           |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ----------------- |
+| **bundler-cache**          | Run "bundle install", and cache the result automatically. Either true or false.                                                                             | No       | `false`           |
+| **cache-version**          | Arbitrary string that will be added to the cache key of the bundler cache. Set or change it if you need to invalidate the cache.                            | No       | `v0`              |
+| **cargo-cache**            | Strategy to use for caching build artifacts (either 'sccache', 'tarball', or 'false')                                                                       | No       | `default`         |
+| **cargo-cache-clean**      | Clean the cargo cache with cargo cache --autoclean                                                                                                          | No       | `true`            |
+| **cargo-cache-extra-path** | Paths to cache for cargo and gem compilation                                                                                                                | No       |                   |
+| **cargo-vendor**           | Vendor cargo dependencies to avoid repeated downloads                                                                                                       | No       | `false`           |
+| **debug**                  | Enable verbose debugging info (includes summary of action)                                                                                                  | No       | `false`           |
+| **ruby-version**           | Engine and version to use, see the syntax in the README. Reads from .ruby-version or .tool-versions if unset. Can be set to 'none' to skip installing Ruby. | No       | `default`         |
+| **rubygems**               | Runs `gem update --system`. See https://github.com/ruby/setup-ruby/blob/master/README.md for more info.                                                     | No       | `default`         |
+| **rustup-components**      | Comma-separated string of additional components to install e.g. clippy, rustfmt                                                                             | No       | `clippy, rustfmt` |
+| **rustup-targets**         | Comma-separated string of additional targets to install e.g. wasm32-unknown-unknown                                                                         | No       |                   |
+| **rustup-toolchain**       | Rustup toolchain specifier e.g. stable, nightly, 1.42.0, nightly-2022-01-01.                                                                                | No       | `stable`          |
+| **working-directory**      | The working directory to use for resolving paths for .ruby-version, .tool-versions and Gemfile.lock.                                                        | No       |                   |
 
 <!-- /inputs -->
 
@@ -67,10 +67,10 @@ jobs:
 
 <!-- outputs -->
 
-| Name              | Description                                   |
-| ----------------- | --------------------------------------------- |
-| **cache-key**     | Derived cache key for the current environment |
-| **ruby-platform** | The platform of the installed ruby            |
-| **ruby-prefix**   | The prefix of the installed ruby              |
+| Name              | Description                                   | Required |
+| ----------------- | --------------------------------------------- | -------- |
+| **cache-key**     | Derived cache key for the current environment | No       |
+| **ruby-platform** | The platform of the installed ruby            | No       |
+| **ruby-prefix**   | The prefix of the installed ruby              | No       |
 
 <!-- /outputs -->

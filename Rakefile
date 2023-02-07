@@ -3,17 +3,17 @@ require "yaml"
 def generate_table(action, replace_key, defaults)
   lines = []
   if defaults
-    lines << "| Name | Description | Default |"
-    lines << "| ---- | ----------- | ------- |"
+    lines << "| Name | Description | Required | Default |"
+    lines << "| ---- | ----------- | -------- | ------- |"
   else
-    lines << "| Name | Description |"
-    lines << "| ---- | ----------- |"
+    lines << "| Name | Description | Required |"
+    lines << "| ---- | ----------- | -------- |"
   end
 
   items = YAML.load_file(action)[replace_key].to_a.sort_by(&:first)
 
   items.each do |key, item|
-    cols = ["**#{key}**", item["description"]]
+    cols = ["**#{key}**", item["description"], item["required"] ? "Yes" : "No"]
     cols << "`#{item["default"]}`".gsub("``", "") if defaults
     cols.map! { |col| col.to_s.gsub("|", '\|').tr("\n", " ") }
     lines << "| #{cols.join(" | ")} |"

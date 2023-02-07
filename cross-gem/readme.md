@@ -57,12 +57,12 @@ jobs:
 
 <!-- inputs -->
 
-| Name                  | Description                                                                                                                      | Default |
-| --------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| **cache-version**     | Arbitrary string that will be added to the cache key of the bundler cache. Set or change it if you need to invalidate the cache. | `v0`    |
-| **platform**          | The platform to cross-compile for (e.g. `x86_64-linux`)                                                                          |         |
-| **ruby-versions**     | The Ruby versions to cross-compile for (e.g. `2.7,3.0,3.1`)                                                                      |         |
-| **working-directory** | The working directory to run the action in.                                                                                      | `.`     |
+| Name                  | Description                                                                                                                      | Required | Default |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------------- | -------- | ------- |
+| **cache-version**     | Arbitrary string that will be added to the cache key of the bundler cache. Set or change it if you need to invalidate the cache. | No       | `v0`    |
+| **platform**          | The platform to cross-compile for (e.g. `x86_64-linux`)                                                                          | Yes      |         |
+| **ruby-versions**     | The Ruby versions to cross-compile for (e.g. `2.7,3.0,3.1`)                                                                      | Yes      |         |
+| **working-directory** | The working directory to run the action in.                                                                                      | No       | `.`     |
 
 <!-- /inputs -->
 
@@ -70,8 +70,8 @@ jobs:
 
 <!-- outputs -->
 
-| Name         | Description                        |
-| ------------ | ---------------------------------- |
-| **gem-path** | The path to the cross-compiled gem |
+| Name         | Description                        | Required |
+| ------------ | ---------------------------------- | -------- |
+| **gem-path** | The path to the cross-compiled gem | No       |
 
 <!-- /outputs -->

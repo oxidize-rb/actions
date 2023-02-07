@@ -26,12 +26,12 @@ jobs:
 
 <!-- inputs -->
 
-| Name             | Description                       | Default   |
-| ---------------- | --------------------------------- | --------- |
-| **crate**        | The crate to install.             |           |
-| **install-path** | The path to install the crate to. | `default` |
-| **strategies**   | The strategies to use.            | `default` |
-| **version**      | The version to install.           |           |
+| Name             | Description                       | Required | Default   |
+| ---------------- | --------------------------------- | -------- | --------- |
+| **crate**        | The crate to install.             | Yes      |           |
+| **install-path** | The path to install the crate to. | No       | `default` |
+| **strategies**   | The strategies to use.            | No       | `default` |
+| **version**      | The version to install.           | Yes      |           |
 
 <!-- /inputs -->
 
@@ -39,8 +39,8 @@ jobs:
 
 <!-- outputs -->
 
-| Name       | Description                     |
-| ---------- | ------------------------------- |
-| **status** | The status of the installation. |
+| Name       | Description                     | Required |
+| ---------- | ------------------------------- | -------- |
+| **status** | The status of the installation. | No       |
 
 <!-- /outputs -->
