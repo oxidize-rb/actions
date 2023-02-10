@@ -18,6 +18,9 @@ inputs:
   working-directory:
     default: "."
     description: "The working directory to run the action in."
+  cargo-cache-clean:
+    description: "Whether to clean the cargo cache after the build."
+    default: "true"
 outputs:
   gem-path:
     description: "The path to the cross-compiled gem"
@@ -44,6 +47,22 @@ runs:
         key: rb-sys-dock-${{ inputs.cache-version }}-${{ inputs.platform }}-${{ hashFiles('**/Gemfile.lock', '**/Cargo.lock') }}
         restore-keys: |
           rb-sys-dock-${{ inputs.cache-version }}-${{ inputs.platform }}-
+
+    - name: Install cargo-cache
+      uses: oxidize-rb/actions/cargo-binstall@v1
+      id: install-cargo-cache
+      if: inputs.cargo-cache-clean == 'true'
+      with:
+        crate: cargo-cache
+        version: 0.8.3
+        strategies: quick-install
+
+    - name: Clean the cargo cache
+      if: inputs.cargo-cache-clean == 'true'
+      uses: oxidize-rb/actions/post-run@v1
+      with:
+        run: cargo-cache --autoclean
+        cwd: ${{ inputs.working-directory }}
 
     - name: Build gem
       shell: bash
