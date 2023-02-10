@@ -63,5 +63,6 @@ namespace :release do
     sh "git tag -f v#{major}"
     sh "git push"
     sh "git push --tags --force"
+    sh "gh release create v#{new_version} --generate-notes"
   end
 end
