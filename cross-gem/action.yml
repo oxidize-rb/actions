@@ -78,8 +78,8 @@ runs:
         : Compile gem
         args=""
 
-        if [ "$INPUT_RUBY_VERSION" != "default" ]; then
-          args="$args --ruby-versions=$INPUT_RUBY_VERSION"
+        if [ "$INPUT_RUBY_VERSIONS" != "default" ]; then
+          args="$args --ruby-versions=$INPUT_RUBY_VERSIONS"
         fi
 
         if [ "$INPUT_TAG" != "default" ]; then
