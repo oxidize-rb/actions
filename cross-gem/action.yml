@@ -76,6 +76,7 @@ runs:
         INPUT_PLATFORM: ${{ inputs.platform }}
       run: |
         : Compile gem
+        set -x
         args=""
 
         if [ "$INPUT_RUBY_VERSIONS" != "default" ]; then
