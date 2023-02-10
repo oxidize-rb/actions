@@ -70,23 +70,27 @@ runs:
     - name: Build gem
       shell: bash
       working-directory: ${{ inputs.working-directory }}
+      env:
+        INPUT_RUBY_VERSIONS: ${{ inputs.ruby-versions }}
+        INPUT_TAG: ${{ inputs.tag }}
+        INPUT_PLATFORM: ${{ inputs.platform }}
       run: |
         : Compile gem
         args=""
 
-        if [ "${{ inputs.ruby-versions }}" != "default" ]; then
-          args="$args --ruby-versions=\"${{ inputs.ruby-versions }}\""
+        if [ "$INPUT_RUBY_VERSION" != "default" ]; then
+          args="$args --ruby-versions=$INPUT_RUBY_VERSION"
         fi
 
-        if [ "${{ inputs.tag }}" != "default" ]; then
-          args="$args --tag=\"${{ inputs.tag }}\""
+        if [ "$INPUT_TAG" != "default" ]; then
+          args="$args --tag=$INPUT_TAG"
         fi
 
         if bundle info rb_sys > /dev/null; then
-          bundle exec rb-sys-dock --platform="${{ inputs.platform }}" $args --build
+          bundle exec rb-sys-dock --platform="$INPUT_PLATFORM" $args --build
         else
           gem install rb_sys
-          rb-sys-dock --platform="${{ inputs.platform }}" $args --build
+          rb-sys-dock --platform="$INPUT_PLATFORM" $args --build
         fi
 
     - name: Set outputs
