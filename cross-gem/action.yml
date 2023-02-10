@@ -11,13 +11,19 @@ inputs:
     required: true
   ruby-versions:
     description: "The Ruby versions to cross-compile for (e.g. `2.7,3.0,3.1`)"
-    required: true
+    default: "default"
   cache-version:
     default: "v0"
     description: "Arbitrary string that will be added to the cache key of the bundler cache. Set or change it if you need to invalidate the cache."
   working-directory:
     default: "."
     description: "The working directory to run the action in."
+  tag:
+    description: "The docker tag to use for the `rb-sys` images."
+    default: "default"
+  cargo-cache-clean:
+    description: "Whether to clean the cargo cache after the build."
+    default: "true"
 outputs:
   gem-path:
     description: "The path to the cross-compiled gem"
@@ -45,16 +51,54 @@ runs:
         restore-keys: |
           rb-sys-dock-${{ inputs.cache-version }}-${{ inputs.platform }}-
 
+    - name: Install cargo-cache
+      uses: oxidize-rb/actions/cargo-binstall@v1
+      id: install-cargo-cache
+      if: inputs.cargo-cache-clean == 'true'
+      with:
+        crate: cargo-cache
+        version: 0.8.3
+        strategies: quick-install
+
+    - name: Clean the cargo cache
+      if: inputs.cargo-cache-clean == 'true'
+      uses: oxidize-rb/actions/post-run@v1
+      with:
+        run: cargo-cache --autoclean
+        cwd: ${{ inputs.working-directory }}
+
     - name: Build gem
       shell: bash
       working-directory: ${{ inputs.working-directory }}
+      env:
+        INPUT_RUBY_VERSIONS: "${{ inputs.ruby-versions }}"
+        INPUT_TAG: "${{ inputs.tag }}"
+        INPUT_PLATFORM: "${{ inputs.platform }}"
+        INPUT_PRE_SCRIPT: "${{ inputs.pre-script }}"
+        INPUT_POST_SCRIPT: "${{ inputs.post-script }}"
       run: |
         : Compile gem
+        set -x
+
+        args=()
+        args+=("--platform")
+        args+=("$INPUT_PLATFORM")
+
+        if [ "$INPUT_RUBY_VERSIONS" != "default" ]; then
+          args+=("--ruby-versions")
+          args+=("$INPUT_RUBY_VERSIONS")
+        fi
+
+        if [ "$INPUT_TAG" != "default" ]; then
+          args+=("--tag")
+          args+=("$INPUT_TAG")
+        fi
+
         if bundle info rb_sys > /dev/null; then
-          bundle exec rb-sys-dock --platform "${{ inputs.platform }}" --ruby-versions "${{ inputs.ruby-versions }}" --build
+          bundle exec rb-sys-dock "${args[@]}" --build
         else
           gem install rb_sys
-          rb-sys-dock --platform "${{ inputs.platform }}" --ruby-versions "${{ inputs.ruby-versions }}" --build
+          rb-sys-dock "${args[@]}" --build
         fi
 
     - name: Set outputs

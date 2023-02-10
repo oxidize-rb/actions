@@ -57,12 +57,14 @@ jobs:
 
 <!-- inputs -->
 
-| Name                  | Description                                                                                                                      | Default |
-| --------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| **cache-version**     | Arbitrary string that will be added to the cache key of the bundler cache. Set or change it if you need to invalidate the cache. | `v0`    |
-| **platform**          | The platform to cross-compile for (e.g. `x86_64-linux`)                                                                          |         |
-| **ruby-versions**     | The Ruby versions to cross-compile for (e.g. `2.7,3.0,3.1`)                                                                      |         |
-| **working-directory** | The working directory to run the action in.                                                                                      | `.`     |
+| Name                  | Description                                                                                                                      | Default   |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------------- | --------- |
+| **cache-version**     | Arbitrary string that will be added to the cache key of the bundler cache. Set or change it if you need to invalidate the cache. | `v0`      |
+| **cargo-cache-clean** | Whether to clean the cargo cache after the build.                                                                                | `true`    |
+| **platform**          | The platform to cross-compile for (e.g. `x86_64-linux`)                                                                          |           |
+| **ruby-versions**     | The Ruby versions to cross-compile for (e.g. `2.7,3.0,3.1`)                                                                      | `default` |
+| **tag**               | The docker tag to use for the `rb-sys` images.                                                                                   | `default` |
+| **working-directory** | The working directory to run the action in.                                                                                      | `.`       |
 
 <!-- /inputs -->
 
