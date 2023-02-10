@@ -11,7 +11,7 @@ inputs:
     required: true
   ruby-versions:
     description: "The Ruby versions to cross-compile for (e.g. `2.7,3.0,3.1`)"
-    required: true
+    default: "default"
   cache-version:
     default: "v0"
     description: "Arbitrary string that will be added to the cache key of the bundler cache. Set or change it if you need to invalidate the cache."
@@ -50,11 +50,17 @@ runs:
       working-directory: ${{ inputs.working-directory }}
       run: |
         : Compile gem
+        args=""
+
+        if [ "${{ inputs.ruby-versions }}" != "default" ]; then
+          args="$args --ruby-versions=\"${{ inputs.ruby-versions }}\""
+        fi
+
         if bundle info rb_sys > /dev/null; then
-          bundle exec rb-sys-dock --platform "${{ inputs.platform }}" --ruby-versions "${{ inputs.ruby-versions }}" --build
+          bundle exec rb-sys-dock --platform="${{ inputs.platform }}" $args --build
         else
           gem install rb_sys
-          rb-sys-dock --platform "${{ inputs.platform }}" --ruby-versions "${{ inputs.ruby-versions }}" --build
+          rb-sys-dock --platform="${{ inputs.platform }}" $args --build
         fi
 
     - name: Set outputs
