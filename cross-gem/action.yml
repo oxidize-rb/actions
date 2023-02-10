@@ -18,6 +18,9 @@ inputs:
   working-directory:
     default: "."
     description: "The working directory to run the action in."
+  tag:
+    description: "The docker tag to use for the `rb-sys` images."
+    default: "default"
   cargo-cache-clean:
     description: "Whether to clean the cargo cache after the build."
     default: "true"
@@ -73,6 +76,10 @@ runs:
 
         if [ "${{ inputs.ruby-versions }}" != "default" ]; then
           args="$args --ruby-versions=\"${{ inputs.ruby-versions }}\""
+        fi
+
+        if [ "${{ inputs.tag }}" != "default" ]; then
+          args="$args --tag=\"${{ inputs.tag }}\""
         fi
 
         if bundle info rb_sys > /dev/null; then
