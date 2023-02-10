@@ -74,10 +74,15 @@ runs:
         INPUT_RUBY_VERSIONS: "${{ inputs.ruby-versions }}"
         INPUT_TAG: "${{ inputs.tag }}"
         INPUT_PLATFORM: "${{ inputs.platform }}"
+        INPUT_PRE_SCRIPT: "${{ inputs.pre-script }}"
+        INPUT_POST_SCRIPT: "${{ inputs.post-script }}"
       run: |
         : Compile gem
         set -x
+
         args=()
+        args+=("--platform")
+        args+=("$INPUT_PLATFORM")
 
         if [ "$INPUT_RUBY_VERSIONS" != "default" ]; then
           args+=("--ruby-versions")
@@ -90,10 +95,10 @@ runs:
         fi
 
         if bundle info rb_sys > /dev/null; then
-          bundle exec rb-sys-dock --platform="$INPUT_PLATFORM"  "${args[@]}" --build
+          bundle exec rb-sys-dock "${args[@]}" --build
         else
           gem install rb_sys
-          rb-sys-dock --platform="$INPUT_PLATFORM" "${args[@]}" --build
+          rb-sys-dock "${args[@]}" --build
         fi
 
     - name: Set outputs
