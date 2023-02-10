@@ -80,11 +80,11 @@ runs:
         args=""
 
         if [ "$INPUT_RUBY_VERSIONS" != "default" ]; then
-          args="$args --ruby-versions=$INPUT_RUBY_VERSIONS"
+          args="$args --ruby-versions=\"$INPUT_RUBY_VERSIONS\""
         fi
 
         if [ "$INPUT_TAG" != "default" ]; then
-          args="$args --tag=$INPUT_TAG"
+          args="$args --tag=\"$INPUT_TAG\""
         fi
 
         if bundle info rb_sys > /dev/null; then
