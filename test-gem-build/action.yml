@@ -1,0 +1,37 @@
+---
+name: "Test gem"
+description: "A GitHub action to test the cross-compilation of a Ruby gem built on multiple platforms."
+author: "@gjtorikian"
+branding:
+  icon: "download-cloud"
+  color: "gray-dark"
+inputs:
+  platform:
+    description: "The platform which the gem was cross-compiled for (e.g. `x86_64-linux`)"
+    required: true
+  ruby-versions:
+    description: "The Ruby versions the gem was cross-compiled for (e.g. `2.7,3.0,3.1`)"
+    default: "default"
+runs:
+  using: "composite"
+  steps:
+    - name: Run tests
+      id: run-tests
+      shell: bash
+      env:
+        INPUT_PLATFORM: "${{ inputs.platform }}"
+        INPUT_RUBY_VERSIONS: "${{ inputs.ruby-versions }}"
+      run: |
+        : Run tests
+        set -x
+
+        args=()
+        args+=("--platform")
+        args+=("$INPUT_PLATFORM")
+
+        if [ "$INPUT_RUBY_VERSIONS" != "default" ]; then
+          args+=("--ruby-versions")
+          args+=("$INPUT_RUBY_VERSIONS")
+        fi
+
+        echo $(ruby $GITHUB_ACTION_PATH/test.rb ${args[@]})
