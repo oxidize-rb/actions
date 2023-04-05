@@ -70,6 +70,7 @@ runs:
         working-directory: ${{ inputs.working-directory }}
         cache-version: ${{ inputs.cache-version }}
         rubygems: ${{ inputs.rubygems }}
+        mingw: headers
 
     - name: Install helpers
       shell: bash
