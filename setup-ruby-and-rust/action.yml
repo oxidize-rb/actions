@@ -95,6 +95,13 @@ runs:
         derived_toolchain="$(ruby --disable-gems $GITHUB_ACTION_PATH/helpers/derive_toolchain.rb ${{ inputs.rustup-toolchain }})"
         echo "toolchain=$derived_toolchain" >> $GITHUB_OUTPUT
 
+    - name: Warn broken mingw toolchain
+      if: contains(steps.derive-toolchain.outputs.toolchain, 'pc-windows-gnu')
+      shell: bash
+      run: |
+        : Warn broken mingw toolchain
+        echo "::warning::There is known issue with the mingw toolchain which may cause your rb-sys CI builds to fail 😢. Consider temporarily disabling Windows builds until https://github.com/oxidize-rb/actions/issues/20 is resolved #helpwanted."
+
     - uses: dtolnay/rust-toolchain@master
       id: rust-toolchain
       with:
