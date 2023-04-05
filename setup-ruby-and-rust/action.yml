@@ -70,7 +70,6 @@ runs:
         working-directory: ${{ inputs.working-directory }}
         cache-version: ${{ inputs.cache-version }}
         rubygems: ${{ inputs.rubygems }}
-        mingw: clang-15
 
     - name: Install helpers
       shell: bash
