@@ -271,7 +271,7 @@ runs:
         echo BINDGEN_EXTRA_CLANG_ARGS="-I$((gcm clang).source -replace 'bin\clang.exe', 'include')" >> $env:GITHUB_ENV
 
     - name: Configure bindgen
-      if: contains(steps.derive-toolchain.outputs.toolchain, 'pc-windows-gnu') == false
+      if: contains(steps.derive-toolchain.outputs.toolchain, 'pc-windows-gnu')
       shell: bash
       run: |
         : Configure bindgen for msys2
