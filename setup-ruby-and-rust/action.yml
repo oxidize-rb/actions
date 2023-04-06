@@ -279,9 +279,9 @@ runs:
         msys_root=""
 
         if [ "$MSYSTEM" = "MINGW64" ]; then
-          msys_root="$RI_DEVKIT/mingw64"
+          msys_root="c:/msys64/mingw64"
         elif [ "$MSYSTEM" = "UCRT64" ]; then
-          msys_root="$RI_DEVKIT/ucrt64"
+          msys_root="c:/msys64/ucrt64"
         else
           echo "Unknown MSYSTEM: $MSYSTEM, cannot configure bindgen"
           exit 1
