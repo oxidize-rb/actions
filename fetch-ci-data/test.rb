@@ -99,7 +99,7 @@ describe "fetch-ci-data" do
   def run_with_input(hash)
     stdin = hash.to_json
     script = File.expand_path("evaluate.rb", __dir__)
-    stdout, stderr, status = Open3.capture3({ "INPUTS" => stdin }, "ruby", script)
+    stdout, stderr, status = Open3.capture3({"INPUTS" => stdin}, "ruby", script)
     raise stderr unless status.success?
     JSON.parse(stdout)
   end

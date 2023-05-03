@@ -6,16 +6,16 @@ require "securerandom"
 cargo_registry_cache_keys = []
 prefix = "cr"
 
-(0..7).each do |i|
+8.times do |i|
   cargo_registry_cache_keys << "#{prefix}#{(Time.now - (i * 60 * 60 * 24)).strftime("%Y%m%d")}"
 end
 
-(0..1).each do |i|
+2.times do |i|
   cargo_registry_cache_keys << "#{prefix}#{(Time.now - (i * 60 * 60 * 24 * 30)).strftime("%Y%m")}"
 end
 
 cache_key = cargo_registry_cache_keys[0]
-restore_keys = cargo_registry_cache_keys[1..-1].join("\n")
+restore_keys = cargo_registry_cache_keys[1..].join("\n")
 
 # raise 'too many keys' if restore_keys.split("\n").size > 10
 # raise 'not enough keys' if restore_keys.split("\n").size < 10

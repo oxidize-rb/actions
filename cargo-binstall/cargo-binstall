@@ -63,10 +63,11 @@ def download_and_save(triple)
 
   puts("Downloading #{url}")
   response = nil
-  begin
+  loop do
     response = Net::HTTP.get_response(URI.parse(url))
     url = response["location"]
-  end while response.is_a?(Net::HTTPRedirection)
+    break unless response.is_a?(Net::HTTPRedirection)
+  end
 
   raise "Checksum mismatch" unless Digest::SHA256.hexdigest(response.body) == checksum
   puts("Verified checksum")

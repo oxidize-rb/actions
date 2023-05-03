@@ -16,7 +16,7 @@ rescue KeyError
   {
     "ruby-platform" => RbConfig::CONFIG["arch"],
     "ruby-prefix" => RbConfig::CONFIG["prefix"],
-    "base-cache-key-level-1" => "v0__test__it",
+    "base-cache-key-level-1" => "v0__test__it"
   }
 end
 

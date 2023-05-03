@@ -25,4 +25,3 @@ if ARGV.include?("--runner")
 else
   puts derive_rust_toolchain_from_rbconfig(ARGV.first)
 end
-
