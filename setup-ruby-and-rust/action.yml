@@ -153,6 +153,7 @@ runs:
         echo "::group::Configuring environment"
 
         echo "CARGO_INCREMENTAL=0" >> $GITHUB_ENV
+        echo "CARGO_NET_RETRY=5" >> $GITHUB_ENV
 
         echo "RUBY_VERSION=$(rbconfig ruby_version)" >> $GITHUB_ENV
 
