@@ -15,7 +15,7 @@ end
 end
 
 cache_key = cargo_registry_cache_keys[0]
-restore_keys = cargo_registry_cache_keys[1..].join("\n")
+restore_keys = cargo_registry_cache_keys[1..-1].join("\n")
 
 # raise 'too many keys' if restore_keys.split("\n").size > 10
 # raise 'not enough keys' if restore_keys.split("\n").size < 10
