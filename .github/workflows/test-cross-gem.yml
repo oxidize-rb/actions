@@ -5,6 +5,7 @@ on:
     paths:
       - "cross-gem/**/*"
       - ".github/workflows/test-cross-gem.yml"
+  workflow_dispatch:
 env:
   SCCACHE_LOG: debug
 jobs:
