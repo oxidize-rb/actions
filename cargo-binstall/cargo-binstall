@@ -5,13 +5,13 @@ require "net/http"
 require "digest/sha2"
 require "fileutils"
 
-CARGO_BINSTALL_VERSION = "0.18.1"
+CARGO_BINSTALL_VERSION = "1.4.3"
 
 CHECKSUMS = {
-  "x86_64-apple-darwin" => "291ad8f69e3f31a620c17a68cb456f64ab736947a76c57ffcc6f8602a09b4cb5",
-  "x86_64-unknown-linux-musl" => "ef05f04e951665b617fe0796ec72e5dc51e8724ee0b09a0da129fa24162369a0",
-  "x86_64-pc-windows-msvc" => "bfc078cb22626bb80e1bb23a3cc74f4362c1326ec3f3dfc1cc46e1bd13528906",
-  "aarch64-apple-darwin" => "9ea261b7617bf6161447aa42b8e8979a7369aed3e5cef6b3774bec55fa4c70b6"
+  "x86_64-apple-darwin" => "71506ac1b15ed20a5f0b326d27883bed9d05d085c3b76a7828c9383636225dfe",
+  "x86_64-unknown-linux-musl" => "d9f9876d9cc053827edb760775b9bacd091df70117c4d7f74b24f8f8749aa2b2",
+  "x86_64-pc-windows-msvc" => "96f8325693ed00ccb96c7ae0d1da83e9c1c644d33d87175d4d4594f71246f283",
+  "aarch64-apple-darwin" => "1cbc0ab3c12c3699379fb7f4640d194f71d4db2534d27b5c6849781920279721"
 }
 
 def infer_vendor
