@@ -18,8 +18,8 @@ jobs:
     steps:
       - uses: "oxidize-rb/actions/cargo-binstall@v1"
         with:
-          name: "wasmtime-cli"
-          version: "4.0.0"
+          crate: "wasmtime-cli"
+          version: "13.0.0"
 ```
 
 ## Inputs
