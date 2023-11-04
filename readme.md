@@ -1,4 +1,4 @@
-# ⚡️ Ruby on Ruby GitHub Actions
+# ⚡️ Ruby on Rust GitHub Actions
 
 This repo contains a collection of GitHub Actions for your Ruby on Rust projects.
 
