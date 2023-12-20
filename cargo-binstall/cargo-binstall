@@ -79,23 +79,15 @@ def download_and_save(triple)
     system("unzip -p #{zipfile} #{filename} > #{outfile}")
     FileUtils.rm(zipfile)
   elsif ext == "tgz"
-    content = pipe_command("tar xzf - -O", stdin: response.body)
-    File.binwrite(outfile, content)
+    zipfile = File.join(tmpdir, 'cargo-binstall.tgz')
+    File.binwrite(zipfile, response.body)
+    system("tar xzf #{zipfile} -O > #{outfile}")
+    FileUtils.rm(zipfile)
   end
 
   ret = outfile
   File.chmod(0o755, ret)
   ret
-end
-
-def pipe_command(cmd, stdin:)
-  require "open3"
-
-  stdout_and_stderr_str, status = Open3.capture2e(cmd, stdin_data: stdin)
-
-  abort(stdout_and_stderr_str) unless status.success?
-
-  stdout_and_stderr_str
 end
 
 def install_cargo_binstall
