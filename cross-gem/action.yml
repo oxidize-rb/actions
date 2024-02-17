@@ -24,6 +24,9 @@ inputs:
   cargo-cache-clean:
     description: "Whether to clean the cargo cache after the build."
     default: "true"
+  cache-save-always:
+    description: "Whether to save the cache even if the build fails."
+    default: "true"
 outputs:
   gem-path:
     description: "The path to the cross-compiled gem"
@@ -48,6 +51,7 @@ runs:
           ${{ env.RB_SYS_DOCK_CACHE_DIR }}
           ${{ inputs.working-directory }}/tmp/rb-sys-dock/${{ inputs.platform }}/target
         key: rb-sys-dock-${{ inputs.cache-version }}-${{ inputs.platform }}-${{ hashFiles('**/Gemfile.lock', '**/Cargo.lock') }}
+        save-always: ${{ inputs.cache-save-always == 'true' }}
         restore-keys: |
           rb-sys-dock-${{ inputs.cache-version }}-${{ inputs.platform }}-
 
@@ -66,6 +70,7 @@ runs:
       with:
         run: cargo-cache --autoclean
         cwd: ${{ inputs.working-directory }}
+        always: ${{ inputs.cache-save-always == 'true' }}
 
     - name: Build gem
       shell: bash

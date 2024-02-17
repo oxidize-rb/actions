@@ -10,9 +10,13 @@ inputs:
   cwd:
     description: "A working directory from which the command needs to be run."
     required: false
+  always:
+    description: "Always run, even if the job fails."
+    required: false
+    default: "false"
 
 runs:
-  using: node16
+  using: node20
   main: main.js
   post: post.js
-  post-if: success()
+  post-if: success() || ${{ inputs.always == 'true' }}

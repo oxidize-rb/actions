@@ -22,10 +22,11 @@ jobs:
 
 <!-- inputs -->
 
-| Name    | Description                                                 | Default                                   |
-| ------- | ----------------------------------------------------------- | ----------------------------------------- |
-| **cwd** | A working directory from which the command needs to be run. |                                           |
-| **run** | A command that needs to be run.                             | `echo "This is a post-action command..."` |
+| Name       | Description                                                 | Default                                   |
+| ---------- | ----------------------------------------------------------- | ----------------------------------------- |
+| **always** | Always run, even if the job fails.                          | `false`                                   |
+| **cwd**    | A working directory from which the command needs to be run. |                                           |
+| **run**    | A command that needs to be run.                             | `echo "This is a post-action command..."` |
 
 <!-- /inputs -->
 

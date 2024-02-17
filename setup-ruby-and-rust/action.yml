@@ -49,6 +49,9 @@ inputs:
   debug:
     description: "Enable verbose debugging info (includes summary of action)"
     default: "false"
+  cache-save-always:
+    description: "Whether to save the cache even if the build fails."
+    default: "true"
 outputs:
   ruby-prefix:
     description: "The prefix of the installed ruby"
@@ -211,6 +214,7 @@ runs:
           ~/.cargo/registry/index/
           ~/.cargo/registry/cache/
           ~/.cargo/git/db/
+        save-always: ${{ inputs.cache-save-always == 'true' }}
 
     - name: Setup base cargo cache
       uses: actions/cache@v4
@@ -223,6 +227,7 @@ runs:
         restore-keys: |
           ${{ steps.set-outputs.outputs.base-cache-key-level-2 }}
           ${{ steps.set-outputs.outputs.base-cache-key-level-1 }}
+        save-always: ${{ inputs.cache-save-always == 'true' }}
 
     - name: Clean the cargo cache
       if: inputs.cargo-cache-clean == 'true' && steps.set-outputs.outputs.cargo-cache == 'tarball'
@@ -230,6 +235,7 @@ runs:
       with:
         run: cargo-cache --autoclean
         cwd: ${{ inputs.working-directory }}
+        always: ${{ inputs.cache-save-always == 'true' }}
 
     - name: Install sccache
       uses: oxidize-rb/actions/cargo-binstall@v1
