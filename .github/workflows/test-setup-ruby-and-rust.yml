@@ -12,9 +12,11 @@ env:
 jobs:
   test:
     name: ${{ matrix.os }} ${{ matrix.repo.slug }} (ruby=${{ matrix.ruby }} cache=${{ matrix.cargo-cache }})
+    continue-on-error: ${{ matrix.experimental }}
     strategy:
       fail-fast: false
       matrix:
+        experimental: [false]
         repo:
           - name: "oxidize-rb/oxi-test"
             slug: oxi-test
@@ -40,23 +42,25 @@ jobs:
               run: bundle exec rake
           - os: "windows-latest"
             ruby: "mswin"
+            experimental: true
             rust: "stable"
             cargo-cache: "true"
             repo:
               name: "oxidize-rb/oxi-test"
               slug: oxi-test
               ref: main
-              run: bundle exec rake || echo "::warning::rake test failed on ${{ matrix.os }} for ${{ matrix.repo.name }}"
+              run: bundle exec rake
           - os: "windows-latest"
             slug: magnus
             ruby: "mswin"
+            experimental: true
             rust: "stable"
             cargo-cache: "true"
             repo:
               name: "matsadler/magnus"
               slug: magnus
               ref: main
-              run: cargo test -- --nocapture || echo "::warning::cargo test failed on ${{ matrix.os }} for ${{ matrix.repo.name }}"
+              run: cargo test -- --nocapture
 
     runs-on: ${{ matrix.os }}
     steps:
