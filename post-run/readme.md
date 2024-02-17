@@ -12,7 +12,7 @@ on: push
 jobs:
   test:
     runs-on: ubuntu-latest
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: oxidize-rb/actions/post-run@v1
         with:
           run: cargo cache --autoclean

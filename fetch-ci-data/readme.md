@@ -6,6 +6,14 @@ A GitHub action to query useful CI data for Ruby on Rust.
 
 ### `stable-ruby-versions`
 
+Use this action to generate a matrix based on Ruby's published CI versions. By
+default, this action will select all "stable" Ruby versions, with one catch...
+
+As it gets closer to December 25th (i.e. next Ruby major), this action will
+start opting in to `ruby-head` builds by default. The goaal is to find a happy
+medium of stability + future preparedness. If you don't like that, or builds
+start failing, you can manually `exclude: [head]`.
+
 ```yaml
 name: Test
 
@@ -31,7 +39,7 @@ jobs:
       matrix:
         ruby: ${{ fromJSON(needs.ci-data.outputs.result).stable-ruby-versions }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}

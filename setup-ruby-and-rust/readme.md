@@ -25,7 +25,7 @@ jobs:
         ruby: ["2.7", "3.0", "3.1", "head"]
         rust: ["stable", "beta"]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: oxidize-rb/actions/setup-ruby-and-rust@v1
         with:
