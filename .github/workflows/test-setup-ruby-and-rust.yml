@@ -32,8 +32,9 @@ jobs:
         cargo-cache: ["true"]
         include:
           - os: "ubuntu-latest"
-            ruby: "3.1"
+            ruby: "3.3"
             rust: "stable"
+            experimental: "false"
             cargo-cache: "sccache"
             repo:
               name: "oxidize-rb/oxi-test"
