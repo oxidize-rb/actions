@@ -52,7 +52,9 @@ jobs:
               ref: main
               run: |
                 set +euo pipefail
-                bundle exec rake || echo "::warning::bundle exec rake failed on mswin" && exit 0
+                if ! bundle exec rake; then
+                  echo "::warning::bundle exec rake failed on mswin"
+                fi
           - os: "windows-latest"
             slug: magnus
             ruby: "mswin"
@@ -65,7 +67,9 @@ jobs:
               ref: main
               run: |
                 set +euo pipefail
-                cargo test -- --nocapture || echo "::warning::cargo test failed on mswin" && exit 0
+                if ! cargo test -- --nocapture; then
+                  echo "::warning::cargo test failed on mswin"
+                fi
 
     runs-on: ${{ matrix.os }}
     steps:
