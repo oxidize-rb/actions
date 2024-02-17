@@ -62,6 +62,33 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - name: Pre-check
+      if: inputs.ruby-version == 'mswin'
+      shell: pwsh
+      run: |
+        # : Check for mswin in workflow files
+        try {
+          $msg = "mswin builds use ruby-master, and which is unstable and may break your build at any time (see https://github.com/MSP-Greg/ruby-loco/issues/12)"
+          $workflowFiles = Get-ChildItem -Path ".github/workflows/" -Filter *.yml
+
+          if ($matches.Count -eq 0) {
+            Write-Output "::notice::$msg"
+          }
+
+          foreach ($file in $workflowFiles) {
+              Write-Output "Checking $file"
+              $matches = Select-String -Path $file.FullName -Pattern "mswin"
+              foreach ($match in $matches) {
+                  $lineNumber = $match.LineNumber
+                  $filePath = $file.FullName
+                  $warningMessage = "::warning file=$filePath,line=$lineNumber::$msg"
+                  Write-Output $warningMessage
+              }
+          }
+        } catch {
+          Write-Output "::warning::Failed to check for mswin in workflow files ($_)"
+        }
+
     - uses: "ruby/setup-ruby-pkgs@v1"
       if: inputs.ruby-version != 'none'
       with:
@@ -174,7 +201,7 @@ runs:
         install-path: ${{ github.action_path }}/bin
 
     - name: Cargo registry cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       if: steps.set-outputs.outputs.cargo-cache != 'false'
       with:
         key: ${{ steps.set-outputs.outputs.cargo-registry-cache-key }}
@@ -186,7 +213,7 @@ runs:
           ~/.cargo/git/db/
 
     - name: Setup base cargo cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       if: steps.set-outputs.outputs.cargo-cache == 'tarball'
       with:
         key: ${{ steps.set-outputs.outputs.base-cache-key-level-3 }}
