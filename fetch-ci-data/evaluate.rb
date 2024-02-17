@@ -1,15 +1,28 @@
 require "net/http"
 require "json"
 require "yaml"
+require "date"
 
-def fetch_json(url)
+def fetch_json(url, attempt = 0)
   uri = URI(url)
   response = Net::HTTP.get(uri)
   JSON.parse(response)
+rescue => e
+  if attempt < 3
+    sleep 1
+    log(:warn, "Failed to fetch #{url}: #{e.message}, retrying (attempt #{attempt + 1})")
+    fetch_json(url, attempt + 1)
+  else
+    abort_with_error! "Failed to fetch #{url}: #{e.message}"
+  end
 end
 
 def abort_with_error!(message)
   abort "::error::#{message}"
+end
+
+def log(level, message)
+  warn "::#{level}:: #{message}"
 end
 
 def truthy_string?(value)
@@ -19,6 +32,14 @@ def truthy_string?(value)
   return false if value == ""
 
   value
+end
+
+def days_til_christmas
+  today = ENV.fetch("LOL_TIMECOP") { Date.today.to_s }
+  today = Date.parse(today)
+  christmas = Date.new(today.year, 12, 25)
+  christmas = Date.new(today.year + 1, 12, 25) if today > christmas
+  (christmas - today).to_i
 end
 
 def fetch_rb_sys_github_action_matrix
@@ -33,6 +54,19 @@ def fetch_stable_ruby_versions(inputs)
   versions = fetch_json("https://cache.ruby-lang.org/pub/misc/ci_versions/cruby.json")
   versions.reject! { |version| opts["exclude"].include?(version) } if opts["exclude"]
   versions.select! { |version| opts["only"].include?(version) } if opts["only"]
+  explicit_ruby_head = (opts.fetch("only", []) + opts.fetch("exclude", [])).include?("head")
+
+  unless explicit_ruby_head
+    if days_til_christmas < 60
+      log(:info, "🎄 It's beginning to look a lot like Christmas, so we're testing against ruby-head")
+    else
+      countdown = days_til_christmas - 60
+      log(:notice, "🎅 Heads up, this CI job will begin testing ruby-head in #{countdown} days") if countdown <= 90
+      versions -= ["head"]
+    end
+  end
+
+  log(:info, "Selected Ruby versions: #{versions.join(', ')}")
 
   {"stable-ruby-versions" => versions}
 end

@@ -15,6 +15,7 @@ gemfile do
   gem "minitest", "~> 5.0"
   gem "minitest-reporters", "~> 1.6"
   gem "ruby-progressbar"
+  gem "mutex_m"
 end
 
 options = {}
