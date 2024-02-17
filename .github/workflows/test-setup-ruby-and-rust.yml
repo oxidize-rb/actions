@@ -40,7 +40,7 @@ jobs:
               name: "oxidize-rb/oxi-test"
               slug: oxi-test
               ref: main
-              run: bundle exec rake || echo "::warning::bundle exec rake failed on mswin"
+              run: bundle exec rake
           - os: "windows-latest"
             ruby: "mswin"
             experimental: true
@@ -50,7 +50,9 @@ jobs:
               name: "oxidize-rb/oxi-test"
               slug: oxi-test
               ref: main
-              run: bundle exec rake
+              run: |
+                set +euo pipefail
+                bundle exec rake || echo "::warning::bundle exec rake failed on mswin" && exit 0
           - os: "windows-latest"
             slug: magnus
             ruby: "mswin"
@@ -61,7 +63,9 @@ jobs:
               name: "matsadler/magnus"
               slug: magnus
               ref: main
-              run: cargo test -- --nocapture || echo "::warning::cargo test failed on mswin"
+              run: |
+                set +euo pipefail
+                cargo test -- --nocapture || echo "::warning::cargo test failed on mswin" && exit 0
 
     runs-on: ${{ matrix.os }}
     steps:
