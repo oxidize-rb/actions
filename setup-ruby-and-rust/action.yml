@@ -201,7 +201,7 @@ runs:
         install-path: ${{ github.action_path }}/bin
 
     - name: Cargo registry cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       if: steps.set-outputs.outputs.cargo-cache != 'false'
       with:
         key: ${{ steps.set-outputs.outputs.cargo-registry-cache-key }}
@@ -213,7 +213,7 @@ runs:
           ~/.cargo/git/db/
 
     - name: Setup base cargo cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       if: steps.set-outputs.outputs.cargo-cache == 'tarball'
       with:
         key: ${{ steps.set-outputs.outputs.base-cache-key-level-3 }}
