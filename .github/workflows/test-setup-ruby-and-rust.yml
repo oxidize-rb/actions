@@ -50,11 +50,7 @@ jobs:
               name: "oxidize-rb/oxi-test"
               slug: oxi-test
               ref: main
-              run: |
-                set +euo pipefail
-                if ! bundle exec rake; then
-                  echo "::warning::bundle exec rake failed on mswin"
-                fi
+              run: bundle exec rake || echo "::warning::bundle exec rake failed on mswin"
           - os: "windows-latest"
             slug: magnus
             ruby: "mswin"
@@ -65,11 +61,7 @@ jobs:
               name: "matsadler/magnus"
               slug: magnus
               ref: main
-              run: |
-                set +euo pipefail
-                if ! cargo test -- --nocapture; then
-                  echo "::warning::cargo test failed on mswin"
-                fi
+              run: cargo test -- --nocapture || echo "::warning::cargo test failed on mswin"
 
     runs-on: ${{ matrix.os }}
     steps:
@@ -100,4 +92,5 @@ jobs:
           SETUP_OUTPUTS: ${{ toJSON(steps.setup.outputs) }}
         run: ruby ./tmp/actions/setup-ruby-and-rust/test.rb -v
       - name: Run tests for ${{ matrix.repo.name }}
+        shell: bash
         run: ${{ matrix.repo.run }}
