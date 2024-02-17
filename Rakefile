@@ -37,14 +37,15 @@ end
 
 namespace :release do
   desc "Tag a new release, and update all of the semver references"
-  task :tag do
+  task :publish do
     sh "git diff --exit-code"
 
     current_version = File.read("VERSION").strip
     new_version = ENV["VERSION"]
 
     if new_version.nil?
-      abort "Usage: rake release:tag VERSION=1.2.3"
+      printf "Current version is %s. Enter new version: ", current_version
+      new_version = STDIN.gets.strip
     end
 
     abort "Invalid version: #{new_version}" unless new_version.match?(/\A\d+\.\d+\.\d+\z/)

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 #
 #  this script inspects the contents of a cross-compiled gem file -- both the files and the gemspec -- to ensure
 #  we're packaging what we expect, and that we're not packaging anything we don't expect.
@@ -53,7 +54,7 @@ gemfile_contents = Dir.mktmpdir do |dir|
       raise "could not unpack gem #{gemfile}"
     end
 
-    %x(tar -ztf data.tar.gz).split("\n")
+    `tar -ztf data.tar.gz`.split("\n")
   end
 end
 
@@ -64,8 +65,8 @@ gemspec = Dir.mktmpdir do |dir|
     end
 
     YAML.safe_load(
-      %x(gunzip -c metadata.gz),
-      permitted_classes: [Gem::Specification, Gem::Version, Gem::Dependency, Gem::Requirement, Time, Symbol],
+      `gunzip -c metadata.gz`,
+      permitted_classes: [Gem::Specification, Gem::Version, Gem::Dependency, Gem::Requirement, Time, Symbol]
     )
   end
 end
@@ -96,7 +97,7 @@ describe File.basename(gemfile) do
   let(:actual_supported_ruby_versions) do
     ruby_versions = options[:ruby_versions] || all_supported_ruby_versions
     return all_supported_ruby_versions if ruby_versions.nil?
-    ruby_versions.split(":").uniq.delete_if { |v| v == "head" }.map { |ver| ver.split(".").take(2).join(".")  }.sort
+    ruby_versions.split(":").uniq.delete_if { |v| v == "head" }.map { |ver| ver.split(".").take(2).join(".") }.sort
   end
 
   describe "setup" do
@@ -134,7 +135,7 @@ describe File.basename(gemfile) do
       assert_equal(
         actual_supported_ruby_versions.length,
         actual.length,
-        "did not expect extra shared library files",
+        "did not expect extra shared library files"
       )
     end
 
@@ -143,13 +144,13 @@ describe File.basename(gemfile) do
       actual_supported_ruby_versions.each do |v|
         assert(
           gemspec.required_ruby_version.satisfied_by?(Gem::Version.new(v)),
-          "required_ruby_version='#{gemspec.required_ruby_version}' should support ruby #{v}",
+          "required_ruby_version='#{gemspec.required_ruby_version}' should support ruby #{v}"
         )
       end
       unsupported_versions.each do |v|
         refute(
           gemspec.required_ruby_version.satisfied_by?(Gem::Version.new(v)),
-          "required_ruby_version='#{gemspec.required_ruby_version}' should not support ruby #{v}",
+          "required_ruby_version='#{gemspec.required_ruby_version}' should not support ruby #{v}"
         )
       end
     end
