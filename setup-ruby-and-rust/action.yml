@@ -66,15 +66,21 @@ runs:
       if: inputs.ruby-version == 'mswin'
       shell: pwsh
       run: |
+        # : Check for mswin in workflow files
         try {
+          $msg = "mswin builds use ruby-master, and which is unstable and may break your build at any time (see https://github.com/MSP-Greg/ruby-loco/issues/12)"
           $workflowFiles = Get-ChildItem -Path ".github/workflows/" -Filter *.yml
 
+          if ($matches.Count -eq 0) {
+            Write-Output "::notice::$msg"
+          }
+
           foreach ($file in $workflowFiles) {
+              Write-Output "Checking $file"
               $matches = Select-String -Path $file.FullName -Pattern "mswin"
               foreach ($match in $matches) {
                   $lineNumber = $match.LineNumber
                   $filePath = $file.FullName
-                  $msg = "mswin builds use ruby-master, and which is unstable and may break your build at any time (see https://github.com/MSP-Greg/ruby-loco/issues/12)"
                   $warningMessage = "::warning file=$filePath,line=$lineNumber::$msg"
                   Write-Output $warningMessage
               }
