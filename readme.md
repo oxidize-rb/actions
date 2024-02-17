@@ -1,37 +1,35 @@
 # ⚡️ Ruby on Rust GitHub Actions
 
-This repo contains a collection of GitHub Actions for your Ruby on Rust projects.
+This repository features a curated suite of GitHub Actions designed for Ruby on Rust projects, making it easier to set up and test native Rust gems within Ruby environments.
 
-## 📦 Actions
+## 📦 Available Actions
 
-### `oxidize-rb/actions/setup-ruby-and-rust@v1`
+### Setup Ruby and Rust (`oxidize-rb/actions/setup-ruby-and-rust@v1`)
 
-A GitHub Action that sets up a Ruby environment and Rust environment for use
-testing native Rust gems.
+⚙️ A GitHub Action that prepares both Ruby and Rust environments, aimed at facilitating the testing of native Rust gems.
 
-[📝 Read the Docs](./setup-ruby-and-rust/readme.md)
+- [📝 Documentation](./setup-ruby-and-rust/readme.md)
 
-### `oxidize-rb/actions/cross-gem@v1`
+### Cross-Compile Ruby Gems (`oxidize-rb/actions/cross-gem@v1`)
 
-A GitHub action to cross-compile a Ruby gem for multiple platforms using
-`rb-sys-dock`.
+🌍 This action enables the cross-compilation of Ruby gems for various platforms using `rb-sys-dock`, enhancing the accessibility of Ruby gems across different systems.
 
-[📝 Read the Docs](./cross-gem/readme.md)
+- [📝 Documentation](./cross-gem/readme.md)
 
-### `oxidize-rb/actions/fetch-ci-data@v1`
+### Fetch CI Data (`oxidize-rb/actions/fetch-ci-data@v1`)
 
-A GitHub Action to query useful CI data for usage in a matrix, etc.
+🔍 Retrieves essential Continuous Integration (CI) data, useful for optimizing CI matrix configurations and other automated processes.
 
-[📝 Read the Docs](./fetch-ci-data/readme.md)
+- [📝 Documentation](./fetch-ci-data/readme.md)
 
-### `oxidize-rb/actions/cargo-binstall@v1`
+### Cargo Binary Installer (`oxidize-rb/actions/cargo-binstall@v1`)
 
-A GitHub action to download and install binaries using `cargo-binstall`.
+📦 Simplifies downloading and installing binaries with `cargo-binstall`, streamlining the integration of Rust binaries into projects.
 
-[📝 Read the Docs](./cargo-binstall/readme.md)
+- [📝 Documentation](./cargo-binstall/readme.md)
 
-### `oxidize-rb/actions/post-run@v1`
+### Post-Run Command (`oxidize-rb/actions/post-run@v1`)
 
-Simple action to run a command after a job has finished.
+🏁 A concise action for executing commands post-job completion, assisting in clean-up or further setup steps.
 
-[📝 Read the Docs](./post-run/readme.md)
+- [📝 Documentation](./post-run/readme.md)
