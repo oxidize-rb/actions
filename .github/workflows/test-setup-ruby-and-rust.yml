@@ -26,7 +26,7 @@ jobs:
             run: cargo test
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
         rust: ["stable"]
-        ruby: ["2.7", "3.0", "3.1", "head"]
+        ruby: ["3.0", "3.1", "3.2", "3.3"]
         cargo-cache: ["true"]
         include:
           - os: "ubuntu-latest"
