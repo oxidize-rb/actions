@@ -59,6 +59,7 @@ jobs:
 
 | Name                  | Description                                                                                                                      | Default   |
 | --------------------- | -------------------------------------------------------------------------------------------------------------------------------- | --------- |
+| **cache-save-always** | Whether to save the cache even if the build fails.                                                                               | `true`    |
 | **cache-version**     | Arbitrary string that will be added to the cache key of the bundler cache. Set or change it if you need to invalidate the cache. | `v0`      |
 | **cargo-cache-clean** | Whether to clean the cargo cache after the build.                                                                                | `true`    |
 | **platform**          | The platform to cross-compile for (e.g. `x86_64-linux`)                                                                          |           |

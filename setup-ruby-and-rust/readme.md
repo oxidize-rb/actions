@@ -48,6 +48,7 @@ jobs:
 | Name                       | Description                                                                                                                                                 | Default           |
 | -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
 | **bundler-cache**          | Run "bundle install", and cache the result automatically. Either true or false.                                                                             | `false`           |
+| **cache-save-always**      | Whether to save the cache even if the build fails.                                                                                                          | `true`            |
 | **cache-version**          | Arbitrary string that will be added to the cache key of the bundler cache. Set or change it if you need to invalidate the cache.                            | `v0`              |
 | **cargo-cache**            | Strategy to use for caching build artifacts (either 'sccache', 'tarball', or 'false')                                                                       | `default`         |
 | **cargo-cache-clean**      | Clean the cargo cache with cargo cache --autoclean                                                                                                          | `true`            |
