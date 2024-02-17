@@ -19,4 +19,4 @@ runs:
   using: node20
   main: main.js
   post: post.js
-  post-if: success() || ${{ inputs.always == 'true' }}
+  post-if: success() || inputs.always == 'true'
