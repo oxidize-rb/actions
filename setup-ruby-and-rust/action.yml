@@ -62,6 +62,27 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - name: Pre-check
+      if: inputs.ruby-version == 'mswin'
+      shell: pwsh
+      run: |
+        try {
+          $workflowFiles = Get-ChildItem -Path ".github/workflows/" -Filter *.yml
+
+          foreach ($file in $workflowFiles) {
+              $matches = Select-String -Path $file.FullName -Pattern "mswin"
+              foreach ($match in $matches) {
+                  $lineNumber = $match.LineNumber
+                  $filePath = $file.FullName
+                  $msg = "mswin builds use ruby-master, and which is unstable and may break your build at any time (see https://github.com/MSP-Greg/ruby-loco/issues/12)"
+                  $warningMessage = "::warning file=$filePath,line=$lineNumber::$msg"
+                  Write-Output $warningMessage
+              }
+          }
+        } catch {
+          Write-Output "::warning::Failed to check for mswin in workflow files ($_)"
+        }
+
     - uses: "ruby/setup-ruby-pkgs@v1"
       if: inputs.ruby-version != 'none'
       with:
