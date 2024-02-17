@@ -235,6 +235,7 @@ runs:
       with:
         run: cargo-cache --autoclean
         cwd: ${{ inputs.working-directory }}
+        always: ${{ inputs.cache-save-always == 'true' }}
 
     - name: Install sccache
       uses: oxidize-rb/actions/cargo-binstall@v1
