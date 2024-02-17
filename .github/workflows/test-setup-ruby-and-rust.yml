@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        experimental: ["false"]
+        experimental: [false]
         repo:
           - name: "oxidize-rb/oxi-test"
             slug: oxi-test
@@ -34,7 +34,7 @@ jobs:
           - os: "ubuntu-latest"
             ruby: "3.3"
             rust: "stable"
-            experimental: "false"
+            experimental: false
             cargo-cache: "sccache"
             repo:
               name: "oxidize-rb/oxi-test"
@@ -43,7 +43,7 @@ jobs:
               run: bundle exec rake
           - os: "windows-latest"
             ruby: "mswin"
-            experimental: "true"
+            experimental: true
             rust: "stable"
             cargo-cache: "true"
             repo:
@@ -54,7 +54,7 @@ jobs:
           - os: "windows-latest"
             slug: magnus
             ruby: "mswin"
-            experimental: "true"
+            experimental: true
             rust: "stable"
             cargo-cache: "true"
             repo:
