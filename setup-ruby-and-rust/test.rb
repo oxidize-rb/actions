@@ -3,6 +3,7 @@ require "bundler/inline"
 gemfile do
   source "https://rubygems.org"
   gem "maxitest"
+  gem "mutex_m"
 end
 
 require "maxitest/autorun"
