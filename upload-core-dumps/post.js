@@ -52,18 +52,23 @@ function downloadFile(url, destPath) {
   execFileSync("curl", args, opts);
 }
 
-function genHelpers(relativePathToCore) {
+function genHelpers(pathToCore) {
+  const relativePathToCore = "." + pathToCore;
   const lldb = `
-    #!/usr/bin/env lldb -s
+    #!/bin/sh
+    lldb -s <<EOF
     target create --core ${relativePathToCore}
     bt all
     quit
+    EOF
   `;
   const gdb = `
-    #!/usr/bin/env gdb -x
+    #!/bin/sh
+    gdb -x <<EOF
     core-file ${relativePathToCore}
     bt
     quit
+    EOF
   `;
   const readme = `
     # Core dump analysis
@@ -88,7 +93,7 @@ function genHelpers(relativePathToCore) {
 
   for (let file in files) {
     fs.writeFileSync(file, files[file]);
-    if (file.startsWith("bin/")) {
+    if (file.startsWith("analyze-")) {
       fs.chmodSync(file, "755");
     }
   }
@@ -117,7 +122,7 @@ function executeScript(scriptPath) {
     fs.copyFileSync(core, coredest);
     const executable = inferCrashingExecutable(core);
     if (executable) {
-      const exedest = path.join(outdir, executable);
+      const exedest = path.join("bin", outdir, executable);
       fs.mkdirSync(path.dirname(exedest), { recursive: true });
       fs.copyFileSync(executable, exedest);
     }
@@ -143,6 +148,7 @@ function executeScript(scriptPath) {
     [envKey("path")]: filesToUpload.join("\n"),
     [envKey("overwrite")]: "true",
     [envKey("if-no-files-found")]: "ignore",
+    [envKey("compression-level")]: "9",
     GITHUB_ACTION_PATH: scriptPath,
   };
 
