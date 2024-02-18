@@ -80,18 +80,20 @@ function genHelpers(relativePathToCore) {
     \`\`\`
   `;
 
-  let files = { lldb, gdb, readme };
+  let files = {
+    ["analyze-lldb"]: lldb,
+    ["analyze-gdb"]: gdb,
+    ["README.md"]: readme,
+  };
 
   for (let file in files) {
-    fs.writeFileSync("/" + file, files[file]);
-    fs.chmodSync(file, "755");
+    fs.writeFileSync(file, files[file]);
+    if (file.startsWith("bin/")) {
+      fs.chmodSync(file, "755");
+    }
   }
 
-  fs.writeFileSync("/README.md", readme);
-
-  const filenames = Object.keys(files).map((file) => `/${file}`);
-
-  return [filenames, "/README.md"];
+  return Object.keys(files);
 }
 
 function executeScript(scriptPath) {
@@ -106,6 +108,24 @@ function executeScript(scriptPath) {
     log(`Found ${cores.length} core dumps to upload`);
   }
 
+  const outdir = "coredumps";
+  fs.mkdirSync(outdir, { recursive: true });
+
+  for (let core of cores) {
+    const coredest = path.join(outdir, core);
+    fs.mkdirSync(path.dirname(coredest), { recursive: true });
+    fs.copyFileSync(core, coredest);
+    const executable = inferCrashingExecutable(core);
+    if (executable) {
+      const exedest = path.join(outdir, executable);
+      fs.mkdirSync(path.dirname(exedest), { recursive: true });
+      fs.copyFileSync(executable, exedest);
+    }
+  }
+  process.chdir(outdir);
+  genHelpers(cores[0]);
+  process.chdir("..");
+
   const arch = `${process.platform}-${process.arch}`;
   const repoName = (process.env.GITHUB_REPOSITORY || "gha").split("/").pop();
   const jobId = process.env.GITHUB_JOB;
@@ -113,13 +133,7 @@ function executeScript(scriptPath) {
   const extraFiles = (process.env.INPUT_EXTRA_FILES_TO_UPLOAD || "").split(
     "\n"
   );
-  const helpers = genHelpers(cores[0]);
-  const filesToUpload = [
-    ...cores,
-    ...inferCrashingExecutables(),
-    ...extraFiles,
-    ...helpers,
-  ];
+  const filesToUpload = [`${outdir}/`, ...extraFiles];
 
   // I know... I know... I'm sorry
   const envKey = (key) => `INPUT_${key.toUpperCase().replace(/ /g, "_")}`;
@@ -143,27 +157,18 @@ function executeScript(scriptPath) {
   execFileSync("node", [scriptPath], { stdio: "inherit", env });
 }
 
-function inferCrashingExecutables() {
-  const coresPath = "/cores";
-  const files = fs.readdirSync(coresPath);
-  const crashingExecutables = new Set();
-
-  for (let file of files) {
-    const filePath = path.join(coresPath, file);
-    const stats = fs.statSync(filePath);
-    if (stats.size <= 50 * 1024 * 1024 * 1024) {
-      const output = execFileSync("file", [filePath], { encoding: "utf-8" });
-      const regex = /execfn: '([^']+)'/;
-      const match = output.match(regex);
-      if (match && match[1]) {
-        const executable = match[1];
-        log(`Inferred crashing executable: ${executable}`);
-        crashingExecutables.add(executable);
-      }
+function inferCrashingExecutable(filePath) {
+  const stats = fs.statSync(filePath);
+  if (stats.size <= 50 * 1024 * 1024 * 1024) {
+    const output = execFileSync("file", [filePath], { encoding: "utf-8" });
+    const regex = /execfn: '([^']+)'/;
+    const match = output.match(regex);
+    if (match && match[1]) {
+      const executable = match[1];
+      log(`Inferred crashing executable: ${executable}`);
+      return executable;
     }
   }
-
-  return Array.from(crashingExecutables);
 }
 
 async function main() {
