@@ -32,6 +32,7 @@ jobs:
             gcc -g -o segfault.exe segfault.c
           else
             cc -g -o segfault segfault.c
+            strip segfault
           fi
           echo "::endgroup::"
 
