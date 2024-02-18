@@ -1,0 +1,14 @@
+---
+name: "Upload Core Dumps"
+description: "A simple GitHub action to upload core dumps after a job."
+inputs:
+  extra-files-to-upload:
+    description: "A list of files to upload."
+    required: false
+    default: ""
+outputs: {}
+runs:
+  using: node20
+  main: main.js
+  post: post.js
+  post-if: always()

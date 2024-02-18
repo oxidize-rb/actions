@@ -1,14 +1,22 @@
-const execSync = require("child_process").execSync;
+const { spawn } = require("child_process");
 
 const run = process.env["INPUT_RUN"];
-const cwd = process.env["INPUT_CWD"];
+const cwd = process.env["INPUT_CWD"] || "."; // Use the current directory as default
 
-const options = { stdio: "inherit" };
+console.log(`::info::Running command in ${cwd}:\n\n${run}`);
 
-if (cwd && cwd.length > 0) {
-  options.cwd = cwd;
-}
+const options = {
+  cwd: cwd,
+  stdio: ["pipe", process.stdout, process.stderr],
+  shell: "/bin/bash",
+};
 
-const command = `bash -c "${run}"`;
+const bashProcess = spawn("/bin/bash", [], options);
 
-execSync(command, options);
+bashProcess.stdin.write(run);
+bashProcess.stdin.end();
+
+bashProcess.on("exit", (code) => {
+  console.log(`Child process exited with code ${code}`);
+  process.exit(code);
+});

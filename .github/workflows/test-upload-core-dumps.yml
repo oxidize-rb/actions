@@ -1,0 +1,41 @@
+---
+name: test-upload-core-dumps
+on:
+  push:
+    paths:
+      - "upload-core-dumps/**/*"
+      - ".github/workflows/test-upload-core-dumps.yml"
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["ubuntu-latest", "windows-latest", "macos-latest"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./upload-core-dumps
+        with:
+          extra-files-to-upload: |
+            /usr/lib/libc*
+            README.md
+
+      - name: Some shitty code
+        shell: bash
+        run: |
+          ulimit -c unlimited # Enable core dumps
+
+          echo "::group::Write some C code to crash"
+          echo "int main() { return *(int*)0 = 1; }" > segfault.c
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            gcc -g -o segfault.exe segfault.c
+          else
+            cc -g -o segfault segfault.c
+            strip segfault
+          fi
+          echo "::endgroup::"
+
+          echo "::group::Running the shitty code"
+          [ -f "segfault" ] && ./segfault || ./segfault.exe || true
+          echo "::endgroup::"
