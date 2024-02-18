@@ -122,7 +122,7 @@ function executeScript(scriptPath) {
     fs.copyFileSync(core, coredest);
     const executable = inferCrashingExecutable(core);
     if (executable) {
-      const exedest = path.join("bin", outdir, executable);
+      const exedest = path.join(outdir, "bin", executable);
       fs.mkdirSync(path.dirname(exedest), { recursive: true });
       fs.copyFileSync(executable, exedest);
     }
