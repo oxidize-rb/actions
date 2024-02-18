@@ -109,7 +109,7 @@ function inferCrashingExecutables() {
     const stats = fs.statSync(filePath);
     if (stats.size <= 50 * 1024 * 1024 * 1024) {
       const output = execFileSync("file", [filePath], { encoding: "utf-8" });
-      const regex = /execfn: '(.*)'/;
+      const regex = /execfn: '([^']+)'/;
       const match = output.match(regex);
       if (match && match[1]) {
         const executable = match[1];
