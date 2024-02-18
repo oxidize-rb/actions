@@ -55,20 +55,20 @@ function downloadFile(url, destPath) {
 function genHelpers(pathToCore) {
   const relativePathToCore = "." + pathToCore;
   const lldb = `
-    #!/bin/sh
-    lldb -s <<EOF
-    target create --core ${relativePathToCore}
-    bt all
-    quit
-    EOF
+#!/bin/sh
+lldb <<EOF
+target create --core ${relativePathToCore}
+bt all
+quit
+EOF
   `;
   const gdb = `
-    #!/bin/sh
-    gdb -x <<EOF
-    core-file ${relativePathToCore}
-    bt
-    quit
-    EOF
+#!/bin/sh
+gdb -x <<EOF
+core-file ${relativePathToCore}
+bt
+quit
+EOF
   `;
   const readme = `
     # Core dump analysis
@@ -76,12 +76,12 @@ function genHelpers(pathToCore) {
 
     ## Using LLDB
     \`\`\`
-    ./analyze-lldb
+    sh ./analyze-lldb
     \`\`\`
 
     ## Using GDB
     \`\`\`
-    ./analyze-gdb
+    sh ./analyze-gdb
     \`\`\`
   `;
 
@@ -93,7 +93,7 @@ function genHelpers(pathToCore) {
 
   for (let file in files) {
     fs.writeFileSync(file, files[file]);
-    if (file.startsWith("analyze-")) {
+    if (file !== "README.md") {
       fs.chmodSync(file, "755");
     }
   }
