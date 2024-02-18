@@ -52,6 +52,48 @@ function downloadFile(url, destPath) {
   execFileSync("curl", args, opts);
 }
 
+function genHelpers(relativePathToCore) {
+  const lldb = `
+    #!/usr/bin/env lldb -s
+    target create --core ${relativePathToCore}
+    bt all
+    quit
+  `;
+  const gdb = `
+    #!/usr/bin/env gdb -x
+    core-file ${relativePathToCore}
+    bt
+    quit
+  `;
+  const readme = `
+    # Core dump analysis
+    This core dump was generated during the CI run. To analyze it, you can use the following commands:
+
+    ## Using LLDB
+    \`\`\`
+    ./analyze-lldb
+    \`\`\`
+
+    ## Using GDB
+    \`\`\`
+    ./analyze-gdb
+    \`\`\`
+  `;
+
+  let files = { lldb, gdb, readme };
+
+  for (let file in files) {
+    fs.writeFileSync("/" + file, files[file]);
+    fs.chmodSync(file, "755");
+  }
+
+  fs.writeFileSync("/README.md", readme);
+
+  const filenames = Object.keys(files).map((file) => `/${file}`);
+
+  return [filenames, "/README.md"];
+}
+
 function executeScript(scriptPath) {
   const cores = filterCoreDumps();
 
@@ -71,10 +113,12 @@ function executeScript(scriptPath) {
   const extraFiles = (process.env.INPUT_EXTRA_FILES_TO_UPLOAD || "").split(
     "\n"
   );
+  const helpers = genHelpers(cores[0]);
   const filesToUpload = [
     ...cores,
     ...inferCrashingExecutables(),
     ...extraFiles,
+    ...helpers,
   ];
 
   // I know... I know... I'm sorry
