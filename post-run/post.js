@@ -8,10 +8,16 @@ console.log(`::info::Running command in ${cwd}:\n\n${run}`);
 const options = {
   cwd: cwd,
   stdio: ["pipe", process.stdout, process.stderr],
-  shell: "/bin/bash",
 };
+let shell;
 
-const bashProcess = spawn("/bin/bash", [], options);
+if (process.env.RUNNER_OS === "Windows") {
+  shell = "C:\\msys64\\usr\\bin\\bash.EXE";
+} else {
+  shell = "/bin/bash";
+}
+
+const bashProcess = spawn(shell, [], options);
 
 bashProcess.stdin.write(run);
 bashProcess.stdin.end();

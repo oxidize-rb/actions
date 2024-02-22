@@ -1,5 +1,5 @@
 // @ts-check
-const { execSync } = require("child_process");
+const { execSync, execFileSync } = require("child_process");
 const fs = require("fs");
 const os = require("os");
 
