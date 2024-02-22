@@ -26,6 +26,10 @@ jobs:
         run: |
           ulimit -c unlimited # Enable core dumps
 
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            drmingw -i || true
+          fi
+
           echo "::group::Write some C code to crash"
           echo "int main() { return *(int*)0 = 1; }" > segfault.c
           if [ "$RUNNER_OS" = "Windows" ]; then

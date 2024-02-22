@@ -1,0 +1,22 @@
+---
+name: test-upload-post-run
+on:
+  push:
+    paths:
+      - "post-run/**/*"
+      - ".github/workflows/test-post-run.yml"
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["ubuntu-latest", "windows-latest", "macos-latest"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./post-run
+        with:
+          run: |
+            echo "Running post-run"
+            ls -la .

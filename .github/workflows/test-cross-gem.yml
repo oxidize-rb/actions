@@ -6,6 +6,9 @@ on:
       - "cross-gem/**/*"
       - ".github/workflows/test-cross-gem.yml"
   workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 env:
   SCCACHE_LOG: debug
 jobs:
