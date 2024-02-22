@@ -11,7 +11,7 @@ const options = {
 };
 let shell;
 
-if (process.platform === "win32") {
+if (process.env.RUNNER_OS === "Windows") {
   shell = "C:\\msys64\\usr\\bin\\bash.EXE";
 } else {
   shell = "/bin/bash";
