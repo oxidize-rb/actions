@@ -74,7 +74,6 @@ runs:
 
     - name: Build gem
       shell: bash
-      working-directory: ${{ inputs.working-directory }}
       env:
         INPUT_RUBY_VERSIONS: "${{ inputs.ruby-versions }}"
         INPUT_TAG: "${{ inputs.tag }}"
@@ -83,11 +82,18 @@ runs:
         INPUT_POST_SCRIPT: "${{ inputs.post-script }}"
       run: |
         : Compile gem
+        echo "Docker Working Directory: $(pwd)"
+        echo "Gem Working Directory: ${{ inputs.working-directory }}"
         set -x
 
         args=()
         args+=("--platform")
         args+=("$INPUT_PLATFORM")
+
+        if [ -n "${{ inputs.working-directory }}" ]; then
+          args+=("--directory")
+          args+=("${{ inputs.working-directory }}")
+        fi
 
         if [ "$INPUT_RUBY_VERSIONS" != "default" ]; then
           args+=("--ruby-versions")
@@ -102,7 +108,10 @@ runs:
         if bundle info rb_sys > /dev/null; then
           bundle exec rb-sys-dock "${args[@]}" --build
         else
+          cwd=$(pwd)
+          cd ${{ inputs.working-directory }}
           gem install rb_sys
+          cd $cwd
           rb-sys-dock "${args[@]}" --build
         fi
 
