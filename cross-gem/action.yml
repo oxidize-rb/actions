@@ -88,7 +88,12 @@ runs:
             gem install rb_sys -v $version
           fi
         else
-          echo "rb_sys: Already installed"
+          if command -v rb-sys-dock; then
+            echo "rb_sys: Already installed"
+          else
+            echo "For some reason, rb_sys is installed but the rb-sys-dock exe is not available. Installing rb_sys again..."
+            gem install rb_sys
+          fi
         fi
 
     - name: Build gem
