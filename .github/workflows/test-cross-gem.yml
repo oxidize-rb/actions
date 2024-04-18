@@ -31,15 +31,16 @@ jobs:
         with:
           repository: ${{ matrix.repo.name }}
           ref: ${{ matrix.repo.ref }}
+            
+      - uses:  ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+
+      - run: bundle install --retry 3
 
       - uses: actions/checkout@v4
         with:
           path: ./tmp/actions
-
-      - uses:  ruby/setup-ruby@v1
-        with:
-          ruby-version: "3.1"
-          bunder-cache: true
 
       - uses: ./tmp/actions/cross-gem
         id: cross-gem
