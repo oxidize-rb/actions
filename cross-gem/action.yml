@@ -76,8 +76,8 @@ runs:
       shell: bash
       working-directory: ${{ inputs.working-directory }}
       run: |
-        version="$((bundle info rb_sys 2>&1 | sed -nE 's/.*rb_sys-([0-9]+\.[0-9]+\.[0-9]+).*/\1/p') || echo "latest")"
-        echo "Installing rb_sys@version"
+        version="$((grep rb_sys Gemfile.lock | head -n 1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+') || echo "latest")"
+        echo "Installing rb_sys@$version"
         
         if [ "$version" = "latest" ]; then
           gem install rb_sys
