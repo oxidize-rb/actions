@@ -72,6 +72,19 @@ runs:
         cwd: ${{ inputs.working-directory }}
         always: ${{ inputs.cache-save-always == 'true' }}
 
+    - name: Setup rb-sys
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        has_rb_sys=$(gem info rb_sys | grep -c rb_sys) || true
+        if [ "$has_rb_sys" = "0" ]; then
+          echo "rb_sys: Installing rb_sys from Gemfile"
+          version=$(bundle info rb_sys 2>&1 | sed -nE 's/.*rb_sys-([0-9]+\.[0-9]+\.[0-9]+).*/\1/p') || true
+          gem install rb_sys -v $version
+        else
+          echo "rb_sys: Already installed"
+        fi
+
     - name: Build gem
       shell: bash
       env:
@@ -82,7 +95,7 @@ runs:
         INPUT_POST_SCRIPT: "${{ inputs.post-script }}"
       run: |
         : Compile gem
-        echo "Docker Working Directory: $(pwd)"
+        echo "Docker Working Directory: $pwd"
         echo "Gem Working Directory: ${{ inputs.working-directory }}"
         set -x
 
@@ -90,10 +103,8 @@ runs:
         args+=("--platform")
         args+=("$INPUT_PLATFORM")
 
-        if [ -n "${{ inputs.working-directory }}" ]; then
-          args+=("--directory")
-          args+=("${{ inputs.working-directory }}")
-        fi
+        args+=("--directory")
+        args+=(${{ inputs.working-directory }})
 
         if [ "$INPUT_RUBY_VERSIONS" != "default" ]; then
           args+=("--ruby-versions")
@@ -105,15 +116,7 @@ runs:
           args+=("$INPUT_TAG")
         fi
 
-        if bundle info rb_sys > /dev/null; then
-          bundle exec rb-sys-dock "${args[@]}" --build
-        else
-          cwd=$(pwd)
-          cd ${{ inputs.working-directory }}
-          gem install rb_sys
-          cd $cwd
-          rb-sys-dock "${args[@]}" --build
-        fi
+        rb-sys-dock "${args[@]}" --build
 
     - name: Set outputs
       id: set-outputs
