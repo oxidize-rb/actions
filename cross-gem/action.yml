@@ -76,24 +76,13 @@ runs:
       shell: bash
       working-directory: ${{ inputs.working-directory }}
       run: |
-        has_rb_sys="$((gem info rb_sys | grep -c rb_sys) || echo "0")"
-        if [ "$has_rb_sys" = "0" ]; then
-          echo "rb_sys: Installing rb_sys from Gemfile"
-          version="$((bundle info rb_sys 2>&1 | sed -nE 's/.*rb_sys-([0-9]+\.[0-9]+\.[0-9]+).*/\1/p') || echo "latest")"
-          echo "Installing rb_sys@version"
-          
-          if [ "$version" = "latest" ]; then
-            gem install rb_sys
-          else
-            gem install rb_sys -v $version
-          fi
+        version="$((bundle info rb_sys 2>&1 | sed -nE 's/.*rb_sys-([0-9]+\.[0-9]+\.[0-9]+).*/\1/p') || echo "latest")"
+        echo "Installing rb_sys@version"
+        
+        if [ "$version" = "latest" ]; then
+          gem install rb_sys
         else
-          if command -v rb-sys-dock; then
-            echo "rb_sys: Already installed"
-          else
-            echo "For some reason, rb_sys is installed but the rb-sys-dock exe is not available. Installing rb_sys again..."
-            gem install rb_sys
-          fi
+          gem install rb_sys -v $version
         fi
 
     - name: Build gem
