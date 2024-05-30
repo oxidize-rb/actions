@@ -298,13 +298,18 @@ runs:
         echo "::endgroup::"
 
     - name: Configure bindgen
+      shell: bash
+      run: |
+        echo BINDGEN_EXTRA_CLANG_ARGS_aarch64-apple-darwin="-I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include" >> $GITHUB_ENV
+
+    - name: Configure bindgen (msvc)
       if: contains(steps.derive-toolchain.outputs.toolchain, 'msvc')
       shell: pwsh
       run: |
         echo LIBCLANG_PATH="$((gcm clang).source -replace 'clang.exe')" >> $env:GITHUB_ENV
         echo BINDGEN_EXTRA_CLANG_ARGS="-I$((gcm clang).source -replace 'bin\clang.exe', 'include')" >> $env:GITHUB_ENV
 
-    - name: Configure bindgen
+    - name: Configure bindgen (msys2)
       if: contains(steps.derive-toolchain.outputs.toolchain, 'pc-windows-gnu')
       shell: bash
       run: |
