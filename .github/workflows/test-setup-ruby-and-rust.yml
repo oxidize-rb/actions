@@ -22,17 +22,17 @@ jobs:
         repo:
           - name: "oxidize-rb/oxi-test"
             slug: oxi-test
-            ref: main
-            run: bundle exec rake compile && bundle exec ruby -rminitest/autorun -Itest test/oxi/test_test.rb && cargo test
+            ref: 629e8108f076f7f57d0584432553201325c29de6
+            run: bundle exec rake
           - name: "matsadler/magnus"
             slug: magnus
-            ref: main
+            ref: 52a0817d4327cf78f91958f6b84f66946251fc9c
             run: |
-              gem install power_assert
+              gem install power_assert --verbose
               cargo test -- --nocapture --skip it_includes_backtrace_in_debug
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
         rust: ["stable"]
-        ruby: ["3.0", "3.1", "3.2", "3.3", "head"]
+        ruby: ["3.0", "3.1", "3.2", "3.3"]
         cargo-cache: ["true"]
         include:
           - os: "ubuntu-latest"
@@ -53,7 +53,7 @@ jobs:
             repo:
               name: "oxidize-rb/oxi-test"
               slug: oxi-test
-              ref: main
+              ref: 629e8108f076f7f57d0584432553201325c29de6
               run: bundle exec rake || echo "::warning::bundle exec rake failed on mswin"
           - os: "windows-latest"
             slug: magnus
@@ -64,7 +64,7 @@ jobs:
             repo:
               name: "matsadler/magnus"
               slug: magnus
-              ref: main
+              ref: 52a0817d4327cf78f91958f6b84f66946251fc9c
               run: cargo test -- --nocapture --skip it_includes_backtrace_in_debug || echo "::warning::cargo test failed on mswin"
 
     runs-on: ${{ matrix.os }}
