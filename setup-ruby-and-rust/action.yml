@@ -327,7 +327,7 @@ runs:
         bindgen_extra_clang_args="--target=${{ steps.derive-toolchain.outputs.toolchain }} --sysroot=$msys_root"
 
         echo "::info::Listing files in $msys_root"
-        ls -la "$msys_root"
+        ls -lar "$msys_root"
 
         echo MSYS_ROOT="$msys_root" >> $GITHUB_ENV
         echo BINDGEN_EXTRA_CLANG_ARGS="$bindgen_extra_clang_args" >> $GITHUB_ENV
