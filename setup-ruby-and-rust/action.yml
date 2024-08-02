@@ -330,8 +330,6 @@ runs:
         ls -la "$msys_root"
 
         echo MSYS_ROOT="$msys_root" >> $GITHUB_ENV
-        echo LIBCLANG_PATH="$libclang_path" >> $GITHUB_ENV
-        echo "$libclang_path" >> $GITHUB_PATH
         echo BINDGEN_EXTRA_CLANG_ARGS="$bindgen_extra_clang_args" >> $GITHUB_ENV
 
         echo "::info::Set BINDGEN_EXTRA_CLANG_ARGS to $bindgen_extra_clang_args"
