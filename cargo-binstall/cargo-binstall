@@ -52,7 +52,7 @@ def tmpdir
   @tmpdir ||= Dir.tmpdir
 end
 
-def download_and_save(triple)
+def download_and_save(triple, attempts = 3)
   checksum = CHECKSUMS.fetch(triple)
   ext = triple.include?("linux") ? "tgz" : "zip"
   url = "https://github.com/cargo-bins/cargo-binstall/releases/download/v#{CARGO_BINSTALL_VERSION}/cargo-binstall-#{triple}.#{ext}"
@@ -88,6 +88,14 @@ def download_and_save(triple)
   ret = outfile
   File.chmod(0o755, ret)
   ret
+rescue => e
+  if attempts > 0
+    warn("Error when downloading: #{e.message}, retrying in 3 seconds...")
+    sleep(3)
+    download_and_save(triple, attempts - 1)
+  else
+    raise
+  end
 end
 
 def install_cargo_binstall
