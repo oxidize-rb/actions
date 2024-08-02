@@ -100,7 +100,6 @@ runs:
         working-directory: ${{ inputs.working-directory }}
         cache-version: ${{ inputs.cache-version }}
         rubygems: ${{ inputs.rubygems }}
-        mingw: mingw-w64-clang-x86_64-headers
 
     - name: Install helpers
       shell: bash
@@ -333,6 +332,7 @@ runs:
         echo MSYS_ROOT="$msys_root" >> $GITHUB_ENV
         echo BINDGEN_EXTRA_CLANG_ARGS="$bindgen_extra_clang_args" >> $GITHUB_ENV
 
+        pacman.exe -Sy --noconfirm --noprogressbar --needed --disable-download-timeout mingw-w64-clang-x86_64-headers
         gem install libclang
         echo "LIBCLANG_PATH=$(ruby -rlibclang -e 'puts Libclang.libdir')" > $GITHUB_ENV
 
