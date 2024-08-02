@@ -23,7 +23,7 @@ jobs:
           - name: "oxidize-rb/oxi-test"
             slug: oxi-test
             ref: main
-            run: bundle exec rake
+            run: bundle exec rake compile && bundle exec ruby -rminitest/autorun -Itest test/oxi/test_test.rb && cargo test
           - name: "matsadler/magnus"
             slug: magnus
             ref: main

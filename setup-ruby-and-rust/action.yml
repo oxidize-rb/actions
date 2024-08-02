@@ -332,4 +332,7 @@ runs:
         echo MSYS_ROOT="$msys_root" >> $GITHUB_ENV
         echo BINDGEN_EXTRA_CLANG_ARGS="$bindgen_extra_clang_args" >> $GITHUB_ENV
 
+        gem install libclang
+        echo "LIBCLANG_PATH=$(ruby -rlibclang -e 'puts Libclang.libdir')" > $GITHUB_ENV
+
         echo "::info::Set BINDGEN_EXTRA_CLANG_ARGS to $bindgen_extra_clang_args"
