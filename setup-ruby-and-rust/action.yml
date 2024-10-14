@@ -19,7 +19,7 @@ inputs:
   rubygems:
     description: "Runs `gem update --system`. See https://github.com/ruby/setup-ruby/blob/master/README.md for more info."
     required: false
-    default: 'default'
+    default: "default"
   working-directory:
     description: "The working directory to use for resolving paths for .ruby-version, .tool-versions and Gemfile.lock."
   cache-version:
@@ -219,7 +219,6 @@ runs:
           ~/.cargo/registry/index/
           ~/.cargo/registry/cache/
           ~/.cargo/git/db/
-        save-always: ${{ inputs.cache-save-always == 'true' }}
 
     - name: Setup base cargo cache
       uses: actions/cache@v4
@@ -232,7 +231,6 @@ runs:
         restore-keys: |
           ${{ steps.set-outputs.outputs.base-cache-key-level-2 }}
           ${{ steps.set-outputs.outputs.base-cache-key-level-1 }}
-        save-always: ${{ inputs.cache-save-always == 'true' }}
 
     - name: Clean the cargo cache
       if: inputs.cargo-cache-clean == 'true' && steps.set-outputs.outputs.cargo-cache == 'tarball'
@@ -241,6 +239,27 @@ runs:
         run: cargo-cache --autoclean
         cwd: ${{ inputs.working-directory }}
         always: ${{ inputs.cache-save-always == 'true' }}
+
+    - name: Save cargo registry cache
+      id: save-cargo-registry-cache
+      if: always() && inputs.cache-save-always == 'true' && steps.set-outputs.outputs.cargo-cache != 'false'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.set-outputs.outputs.cargo-registry-cache-key }}
+        path: |
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+
+    - name: Save base cargo cache
+      id: save-base-cargo-cache
+      if: always() && inputs.cache-save-always == 'true' && steps.set-outputs.outputs.cargo-cache == 'tarball'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.set-outputs.outputs.base-cache-key-level-3 }}
+        path: |
+          ~/.cargo/bin/
+          ./target/
 
     - name: Install sccache
       uses: oxidize-rb/actions/cargo-binstall@v1
@@ -260,7 +279,6 @@ runs:
           core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
           core.exportVariable('RUSTC_WRAPPER', process.env.RUSTC_WRAPPER || 'sccache');
           core.exportVariable('SCCACHE_C_CUSTOM_CACHE_BUSTER', '${{ inputs.cache-version }}-${{ steps.rust-toolchain.outputs.cachekey }}');
-
 
     - name: Install sccache
       if: steps.set-outputs.outputs.cargo-cache == 'sccache'
