@@ -9,6 +9,10 @@ inputs:
   ruby-version:
     description: "Engine and version to use, see the syntax in the README. Reads from .ruby-version or .tool-versions if unset. Can be set to 'none' to skip installing Ruby."
     default: "default"
+  bundler:
+    description: "The version of Bundler to install. See https://github.com/ruby/setup-ruby/blob/master/README.md for more info."
+    required: false
+    default: 'default'
   bundler-cache:
     description: 'Run "bundle install", and cache the result automatically. Either true or false.'
     default: "false"
@@ -96,6 +100,7 @@ runs:
       if: inputs.ruby-version != 'none'
       with:
         ruby-version: ${{ inputs.ruby-version }}
+        bundler: ${{ inputs.bundler }}
         bundler-cache: ${{ inputs.bundler-cache }}
         working-directory: ${{ inputs.working-directory }}
         cache-version: ${{ inputs.cache-version }}
