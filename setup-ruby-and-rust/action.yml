@@ -157,7 +157,7 @@ runs:
       run: |
         : Set outputs
         ruby_platform="$(rbconfig arch)"
-        ruby_version="$(rbconfig MAJOR).$(rbconfig MINOR).$(rbconfig TEENY)"
+        ruby_version="$(rbconfig ruby_version)"
 
         echo "ruby-prefix=$(rbconfig prefix)" >> $GITHUB_OUTPUT
         echo "ruby-platform=$ruby_platform" >> $GITHUB_OUTPUT
