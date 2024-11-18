@@ -43,6 +43,16 @@ jobs:
               slug: oxi-test
               ref: main
               run: bundle exec rake
+          - os: "ubuntu-latest"
+            ruby: "truffleruby"
+            rust: "stable"
+            experimental: true
+            cargo-cache: "sccache"
+            repo:
+              name: "oxidize-rb/oxi-test"
+              slug: oxi-test
+              ref: main
+              run: bundle exec rake
           - os: "windows-latest"
             ruby: "mswin"
             experimental: true
