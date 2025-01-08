@@ -66,6 +66,9 @@ def fetch_stable_ruby_versions(inputs)
     end
   end
 
+  # See https://github.com/rake-compiler/rake-compiler-dock/blob/c4e7dc390e0757891ad8c7898953f87a35c957dc/History.md?plain=1#L53
+  # for more information on v3.3.5.
+  versions.each_with_index { |version, i| versions[i] = "3.3.5" and break if version == "3.3" }
   log(:info, "Selected Ruby versions: #{versions.join(', ')}")
 
   {"stable-ruby-versions" => versions}
