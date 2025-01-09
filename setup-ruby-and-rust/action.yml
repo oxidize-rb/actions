@@ -352,5 +352,8 @@ runs:
         echo "::info::Listing files in $msys_root"
         ls -la "$msys_root"
 
+        echo "::info::List clang include dir"
+        echo "int main() { return 0; }" > foo.c && clang foo.c -v
+
         echo "::info::Set BINDGEN_EXTRA_CLANG_ARGS to $bindgen_extra_clang_args"
         echo BINDGEN_EXTRA_CLANG_ARGS="$bindgen_extra_clang_args" >> $GITHUB_ENV
