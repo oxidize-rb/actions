@@ -350,7 +350,10 @@ runs:
         fi
 
         libclang_path="$msys_root/opt/llvm-15/bin"
-        bindgen_extra_clang_args="--target=${{ steps.derive-toolchain.outputs.toolchain }} --sysroot=$msys_root -I'C:\Program Files\LLVM\lib\clang\18\include'"
+        mkdir %TEMP%\extra-includes
+        cp 'C:\Program Files\LLVM\lib\clang\18\include\stdchkint.h' %TEMP%\extra-includes
+
+        bindgen_extra_clang_args="--target=${{ steps.derive-toolchain.outputs.toolchain }} --sysroot=$msys_root -I%TEMP%\extra-includes"
 
         echo "::info::List clang include dir"
         echo "int main() { return 0; }" > foo.c && clang foo.c -v
