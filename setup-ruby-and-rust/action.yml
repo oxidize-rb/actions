@@ -351,7 +351,8 @@ runs:
 
         libclang_path="$msys_root/opt/llvm-15/bin"
         mkdir %TEMP%\extra-includes
-        cp 'C:\Program Files\LLVM\lib\clang\18\include\stdchkint.h' %TEMP%\extra-includes
+        ls 'C:\Program Files\LLVM\lib\clang\18\include'
+        # cp 'C:\Program Files\LLVM\lib\clang\18\include\stdchkint.h' %TEMP%\extra-includes
 
         bindgen_extra_clang_args="--target=${{ steps.derive-toolchain.outputs.toolchain }} --sysroot=$msys_root -I%TEMP%\extra-includes"
 
