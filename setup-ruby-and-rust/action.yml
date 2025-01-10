@@ -350,12 +350,19 @@ runs:
         fi
 
         libclang_path="$msys_root/opt/llvm-15/bin"
-        mkdir %TEMP%\extra-includes
+        tmp_dir=$(expander "%TMP%")
+        mkdir $tmp_dir\extra-includes
+
+
+        echo "::info::Debug"
+        echo $tmp_dir
+        ls $tmp_dir\extra-includes
+
         curl https://raw.githubusercontent.com/llvm/llvm-project/refs/heads/main/clang/lib/Headers/stdckdint.h > %TEMP%\extra-includes\stdckdint.h
         # ls 'C:\Program Files\LLVM\lib\clang\18\include'
         # cp 'C:\Program Files\LLVM\lib\clang\18\include\stdchkint.h' %TEMP%\extra-includes
 
-        bindgen_extra_clang_args="--target=${{ steps.derive-toolchain.outputs.toolchain }} --sysroot=$msys_root -I%TEMP%\extra-includes"
+        bindgen_extra_clang_args="--target=${{ steps.derive-toolchain.outputs.toolchain }} --sysroot=$msys_root -I$tmp_dir\extra-includes"
 
         echo "::info::List clang include dir"
         echo "int main() { return 0; }" > foo.c && clang foo.c -v
