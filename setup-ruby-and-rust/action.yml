@@ -349,18 +349,11 @@ runs:
           exit 1
         fi
 
-        libclang_path="$msys_root/opt/llvm-15/bin"
-        extra_includes=$msys_root/opt/extra-includes
+        libclang_path=$msys_root/opt/llvm-15/bin
 
-        echo $extra_includes
-        mkdir -p $extra_includes
-
-        curl https://raw.githubusercontent.com/llvm/llvm-project/refs/heads/main/clang/lib/Headers/stdckdint.h > $extra_includes/stdckdint.h
-
-        echo "::info::List extra includes"
-        ls $extra_includes
-        # ls 'C:\Program Files\LLVM\lib\clang\18\include'
-        # cp 'C:\Program Files\LLVM\lib\clang\18\include\stdchkint.h' %TEMP%\extra-includes
+        extra_includes=$msys_root/opt/rb-sys/include
+        mkdir -p $msys_root/opt/rb-sys/include
+        cp 'C:\Program Files\LLVM\lib\clang\18\include\stdckdint.h' $extra_includes
 
         bindgen_extra_clang_args="--target=${{ steps.derive-toolchain.outputs.toolchain }} --sysroot=$msys_root -I$extra_includes"
 
