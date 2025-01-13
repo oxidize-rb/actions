@@ -92,7 +92,8 @@ runs:
       shell: bash
       working-directory: ${{ inputs.working-directory }}
       run: |
-        rb_sys_dock_exe=/opt/hostedtoolcache/Ruby/3.3.6/x64/lib/ruby/gems/3.3.0/gems/rb_sys-0.9.107/exe/rb-sys-dock
+        ls /opt/hostedtoolcache/Ruby/
+        rb_sys_dock_exe=/opt/hostedtoolcache/Ruby/3.4.1/x64/lib/ruby/gems/3.4.0/gems/rb_sys-0.9.107/exe/rb-sys-dock
 
         sed -i 's/docker_options = \[\]/docker_options = \["--pid=host"\]/' $rb_sys_dock_exe
 
