@@ -266,7 +266,7 @@ runs:
       if: steps.set-outputs.outputs.cargo-cache == 'sccache'
       with:
         crate: sccache
-        version: 0.3.3
+        version: 0.9.1
         strategies: quick-install
         install-path: ${{ github.action_path }}/bin
 
