@@ -105,8 +105,6 @@ runs:
         working-directory: ${{ inputs.working-directory }}
         cache-version: ${{ inputs.cache-version }}
         rubygems: ${{ inputs.rubygems }}
-        # for now we have to use clang-15 for mingw builds, since our bindgen is too old to work with clang-16
-        mingw: clang-15
 
     - name: Install helpers
       shell: bash
@@ -349,23 +347,13 @@ runs:
           exit 1
         fi
 
-        # Add stdckdint.h from LLVM 18 to prevent Ruby 3.4's header from erroring
-        extra_includes=$msys_root/opt/rb-sys/include
-        mkdir -p $msys_root/opt/rb-sys/include
-        cp 'C:\Program Files\LLVM\lib\clang\18\include\stdckdint.h' $extra_includes
+        # The preprocessor definitions are necessary to work around an incompatibility with
+        # C headers included in clang 16+ and bindgen: https://github.com/rust-lang/rust-bindgen/issues/2500.
+        bindgen_extra_clang_args="--target=${{ steps.derive-toolchain.outputs.toolchain }} --sysroot=$msys_root -D__AVX512VLFP16INTRIN_H -D__AVX512FP16INTRIN_H"
 
-        libclang_path="$msys_root/opt/llvm-15/bin"
-        bindgen_extra_clang_args="--target=${{ steps.derive-toolchain.outputs.toolchain }} --sysroot=$msys_root -I$extra_includes"
-
-        echo "::info::Listing files in $libclang_path"
-        ls -la "$libclang_path"
         echo "::info::Listing files in $msys_root"
         ls -la "$msys_root"
 
-        # We can't use llvm-16 just yet due to backwards compatibility issues, so we have to workaround for now
-        echo MSYS_ROOT="$msys_root" >> $GITHUB_ENV
-        echo LIBCLANG_PATH="$libclang_path" >> $GITHUB_ENV
-        echo "$libclang_path" >> $GITHUB_PATH
         echo BINDGEN_EXTRA_CLANG_ARGS="$bindgen_extra_clang_args" >> $GITHUB_ENV
 
         echo "::info::Set LIBCLANG_PATH to $libclang_path"
