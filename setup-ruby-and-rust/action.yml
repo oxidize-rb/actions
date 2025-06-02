@@ -12,7 +12,7 @@ inputs:
   bundler:
     description: "The version of Bundler to install. See https://github.com/ruby/setup-ruby/blob/master/README.md for more info."
     required: false
-    default: 'default'
+    default: "default"
   bundler-cache:
     description: 'Run "bundle install", and cache the result automatically. Either true or false.'
     default: "false"
@@ -336,16 +336,7 @@ runs:
       run: |
         : Configure bindgen for msys2
 
-        msys_root=""
-
-        if [ "$MSYSTEM" = "MINGW64" ]; then
-          msys_root="c:/msys64/mingw64"
-        elif [ "$MSYSTEM" = "UCRT64" ]; then
-          msys_root="c:/msys64/ucrt64"
-        else
-          echo "Unknown MSYSTEM: $MSYSTEM, cannot configure bindgen"
-          exit 1
-        fi
+        msys_root=${RI_DEVKIT//\\/\/}$MSYSTEM_PREFIX
 
         # The preprocessor definitions are necessary to work around an incompatibility with
         # C headers included in clang 16+ and bindgen: https://github.com/rust-lang/rust-bindgen/issues/2500.
