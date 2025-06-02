@@ -90,18 +90,19 @@ jobs:
       - uses: actions/checkout@v4
         with:
           path: ./tmp/actions
-      
+
       - name: Patch rb-sys version to use main
+        shell: bash
         run: |
           mkdir -p .cargo
           echo "[patch.crates-io]" >> .cargo/config.toml
           echo "rb-sys = { git = \"https://github.com/oxidize-rb/rb-sys\", branch = \"main\" }" >> .cargo/config.toml
           echo "rb-sys-env = { git = \"https://github.com/oxidize-rb/rb-sys\", branch = \"main\" }" >> .cargo/config.toml
-          
+
           if [[ -f Gemfile ]]; then
             sed -i.bak "s|gem 'rb_sys', '.*'|gem 'rb_sys', github: 'oxidize-rb/rb-sys', branch: 'main'|g" Gemfile
           fi
-          
+
           if [[ -f Cargo.toml ]]; then
             cargo update -p rb-sys -p rb-sys-env || echo "No rb-sys dependencies found"
           fi
