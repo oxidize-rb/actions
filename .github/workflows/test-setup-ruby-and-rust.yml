@@ -27,7 +27,9 @@ jobs:
           - name: "matsadler/magnus"
             slug: magnus
             ref: main
-            run: cargo test -- --nocapture --skip it_includes_backtrace_in_debug
+            run: |
+              gem install power_assert
+              cargo test -- --nocapture --skip it_includes_backtrace_in_debug
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
         rust: ["stable"]
         ruby: ["3.0", "3.1", "3.2", "3.3", "head"]
@@ -73,7 +75,9 @@ jobs:
               name: "matsadler/magnus"
               slug: magnus
               ref: main
-              run: cargo test -- --nocapture --skip it_includes_backtrace_in_debug || echo "::warning::cargo test failed on mswin"
+              run: |
+                gem install power_assert
+                cargo test -- --nocapture --skip it_includes_backtrace_in_debug || echo "::warning::cargo test failed on mswin"
 
     runs-on: ${{ matrix.os }}
     steps:
