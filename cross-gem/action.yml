@@ -47,14 +47,13 @@ runs:
         echo "RB_SYS_DOCK_CACHE_DIR=$rb_sys_dock_cache_dir" >> $GITHUB_ENV
         echo "rb_sys_version=$rb_sys_version" >> $GITHUB_OUTPUT
 
-    - name: Setup caching
-      uses: actions/cache@v4
+    - name: Restore cache
+      uses: actions/cache/restore@v4
       with:
         path: |
           ${{ env.RB_SYS_DOCK_CACHE_DIR }}
           ${{ inputs.working-directory }}/tmp/rb-sys-dock/${{ inputs.platform }}/target
         key: rb-sys-dock-${{ inputs.cache-version }}-${{ inputs.platform }}-${{ hashFiles('**/Gemfile.lock', '**/Cargo.lock') }}
-        save-always: ${{ inputs.cache-save-always == 'true' }}
         restore-keys: |
           rb-sys-dock-${{ inputs.cache-version }}-${{ inputs.platform }}-
 
@@ -81,7 +80,7 @@ runs:
       run: |
         version="${{ steps.configure.outputs.rb_sys_version }}"
         echo "Installing rb_sys@$version"
-        
+
         if [ "$version" = "latest" ]; then
           gem install rb_sys
         else
@@ -89,6 +88,7 @@ runs:
         fi
 
     - name: Build gem
+      id: build
       shell: bash
       env:
         INPUT_RUBY_VERSIONS: "${{ inputs.ruby-versions }}"
@@ -101,6 +101,7 @@ runs:
         echo "Docker Working Directory: $pwd"
         echo "Gem Working Directory: ${{ inputs.working-directory }}"
         set -x
+        set +e
 
         args=()
         args+=("--platform")
@@ -120,6 +121,19 @@ runs:
         fi
 
         rb-sys-dock "${args[@]}" --build
+
+        exitcode="$?"
+        echo "build_exitcode=$exitcode" >> $GITHUB_OUTPUT
+        exit "$exitcode"
+
+    - name: Save cache
+      uses: actions/cache/save@v4
+      if: ${{ (always() && inputs.cache-save-always == 'true') || steps.set-outputs.outputs.build == 0 }}
+      with:
+        path: |
+          ${{ env.RB_SYS_DOCK_CACHE_DIR }}
+          ${{ inputs.working-directory }}/tmp/rb-sys-dock/${{ inputs.platform }}/target
+        key: rb-sys-dock-${{ inputs.cache-version }}-${{ inputs.platform }}-${{ hashFiles('**/Gemfile.lock', '**/Cargo.lock') }}
 
     - name: Set outputs
       id: set-outputs
