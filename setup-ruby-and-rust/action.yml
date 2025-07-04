@@ -338,9 +338,15 @@ runs:
 
         msys_root=${RI_DEVKIT//\\/\/}$MSYSTEM_PREFIX
 
+        # Extract just the target triple from the toolchain (remove channel prefix like "stable-")
+        target_triple="${{ steps.derive-toolchain.outputs.toolchain }}"
+        # Remove channel prefix if present (e.g., "stable-" from "stable-x86_64-pc-windows-gnu")
+        target_triple="${target_triple#*-x86_64}"
+        target_triple="x86_64${target_triple}"
+
         # The preprocessor definitions are necessary to work around an incompatibility with
         # C headers included in clang 16+ and bindgen: https://github.com/rust-lang/rust-bindgen/issues/2500.
-        bindgen_extra_clang_args="--target=${{ steps.derive-toolchain.outputs.toolchain }} --sysroot=$msys_root -D__AVX512VLFP16INTRIN_H -D__AVX512FP16INTRIN_H"
+        bindgen_extra_clang_args="--target=$target_triple --sysroot=$msys_root -D__AVX512VLFP16INTRIN_H -D__AVX512FP16INTRIN_H"
 
         echo "::info::Listing files in $msys_root"
         ls -la "$msys_root"
