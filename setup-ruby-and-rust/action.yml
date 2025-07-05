@@ -339,10 +339,16 @@ runs:
         msys_root=${RI_DEVKIT//\\/\/}$MSYSTEM_PREFIX
 
         # Extract just the target triple from the toolchain (remove channel prefix like "stable-")
-        target_triple="${{ steps.derive-toolchain.outputs.toolchain }}"
-        # Remove channel prefix if present (e.g., "stable-" from "stable-x86_64-pc-windows-gnu")
-        target_triple="${target_triple#*-x86_64}"
-        target_triple="x86_64${target_triple}"
+        toolchain="${{ steps.derive-toolchain.outputs.toolchain }}"
+        
+        # Check if the toolchain contains a target triple
+        if [[ "$toolchain" =~ -x86_64-pc-windows-gnu$ ]]; then
+          # Extract the target triple by removing the channel prefix
+          target_triple="x86_64-pc-windows-gnu"
+        else
+          # If no target triple, use default for Windows GNU
+          target_triple="x86_64-pc-windows-gnu"
+        fi
 
         # The preprocessor definitions are necessary to work around an incompatibility with
         # C headers included in clang 16+ and bindgen: https://github.com/rust-lang/rust-bindgen/issues/2500.
