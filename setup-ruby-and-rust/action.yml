@@ -350,9 +350,8 @@ runs:
           target_triple="x86_64-pc-windows-gnu"
         fi
 
-        # The preprocessor definitions are necessary to work around an incompatibility with
-        # C headers included in clang 16+ and bindgen: https://github.com/rust-lang/rust-bindgen/issues/2500.
-        bindgen_extra_clang_args="--target=$target_triple --sysroot=$msys_root -D__AVX512VLFP16INTRIN_H -D__AVX512FP16INTRIN_H"
+        # Set up basic bindgen args for Windows GNU target
+        bindgen_extra_clang_args="--target=$target_triple --sysroot=$msys_root"
 
         echo "::info::Listing files in $msys_root"
         ls -la "$msys_root"
