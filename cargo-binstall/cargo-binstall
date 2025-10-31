@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 
 require "rbconfig"
-require "net/http"
 require "digest/sha2"
 require "fileutils"
 
@@ -62,28 +61,24 @@ def download_and_save(triple, attempts = 3)
   return outfile if File.exist?(outfile)
 
   puts("Downloading #{url}")
-  response = nil
-  loop do
-    response = Net::HTTP.get_response(URI.parse(url))
-    url = response["location"]
-    break unless response.is_a?(Net::HTTPRedirection)
-  end
+  download_file = File.join(tmpdir, "cargo-binstall-download.#{ext}")
 
-  raise "Checksum mismatch" unless Digest::SHA256.hexdigest(response.body) == checksum
+  # download and follow redirects
+  system("curl", "-sSL", "-o", download_file, url) || raise("Download failed")
+
+  response_body = File.binread(download_file)
+
+  raise "Checksum mismatch" unless Digest::SHA256.hexdigest(response_body) == checksum
   puts("Verified checksum")
 
   # Unzip on macOS
   if ext == "zip"
-    zipfile = File.join(tmpdir, "cargo-binstall.zip")
-    File.binwrite(zipfile, response.body)
-    system("unzip -p #{zipfile} #{filename} > #{outfile}")
-    FileUtils.rm(zipfile)
+    system("unzip -p #{download_file} #{filename} > #{outfile}")
   elsif ext == "tgz"
-    zipfile = File.join(tmpdir, 'cargo-binstall.tgz')
-    File.binwrite(zipfile, response.body)
-    system("tar xzf #{zipfile} -O > #{outfile}")
-    FileUtils.rm(zipfile)
+    system("tar xzf #{download_file} -O > #{outfile}")
   end
+
+  FileUtils.rm(download_file)
 
   ret = outfile
   File.chmod(0o755, ret)
