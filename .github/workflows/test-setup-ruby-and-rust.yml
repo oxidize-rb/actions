@@ -87,11 +87,11 @@ jobs:
           INPUTS: ${{ toJSON(matrix) }}
         run: |
           echo "$INPUTS" | jq
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           repository: ${{ matrix.repo.name }}
           ref: ${{ matrix.repo.ref }}
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           path: ./tmp/actions
 
