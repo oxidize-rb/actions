@@ -27,6 +27,9 @@ inputs:
   cache-save-always:
     description: "Whether to save the cache even if the build fails."
     default: "true"
+  mount-toolchains:
+    description: "Whether to mount cross-compilation toolchains."
+    default: "false"
 outputs:
   gem-path:
     description: "The path to the cross-compiled gem"
@@ -96,6 +99,7 @@ runs:
         INPUT_PLATFORM: "${{ inputs.platform }}"
         INPUT_PRE_SCRIPT: "${{ inputs.pre-script }}"
         INPUT_POST_SCRIPT: "${{ inputs.post-script }}"
+        INPUT_MOUNT_TOOLCHAINS: "${{ inputs.mount-toolchains }}"
       run: |
         : Compile gem
         echo "Docker Working Directory: $pwd"
@@ -118,6 +122,10 @@ runs:
         if [ "$INPUT_TAG" != "default" ]; then
           args+=("--tag")
           args+=("$INPUT_TAG")
+        fi
+
+        if [ "$INPUT_MOUNT_TOOLCHAINS" = "true" ]; then
+          args+=("--mount-toolchains")
         fi
 
         rb-sys-dock "${args[@]}" --build
