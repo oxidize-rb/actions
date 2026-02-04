@@ -62,6 +62,7 @@ jobs:
 | **cache-save-always** | Whether to save the cache even if the build fails.                                                                               | `true`    |
 | **cache-version**     | Arbitrary string that will be added to the cache key of the bundler cache. Set or change it if you need to invalidate the cache. | `v0`      |
 | **cargo-cache-clean** | Whether to clean the cargo cache after the build.                                                                                | `true`    |
+| **mount-toolchains**  | Whether to mount cross-compilation toolchains.                                                                                   | `false`   |
 | **platform**          | The platform to cross-compile for (e.g. `x86_64-linux`)                                                                          |           |
 | **ruby-versions**     | The Ruby versions to cross-compile for (e.g. `2.7,3.0,3.1`)                                                                      | `default` |
 | **tag**               | The docker tag to use for the `rb-sys` images.                                                                                   | `default` |
