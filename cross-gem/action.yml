@@ -30,6 +30,9 @@ inputs:
   mount-toolchains:
     description: "Whether to mount cross-compilation toolchains."
     default: "false"
+  pre-script:
+    description: "A shell command to run inside the container before the gem build. Useful for installing system dependencies needed by native extensions."
+    default: ""
 outputs:
   gem-path:
     description: "The path to the cross-compiled gem"
@@ -98,7 +101,6 @@ runs:
         INPUT_TAG: "${{ inputs.tag }}"
         INPUT_PLATFORM: "${{ inputs.platform }}"
         INPUT_PRE_SCRIPT: "${{ inputs.pre-script }}"
-        INPUT_POST_SCRIPT: "${{ inputs.post-script }}"
         INPUT_MOUNT_TOOLCHAINS: "${{ inputs.mount-toolchains }}"
       run: |
         : Compile gem
@@ -128,7 +130,11 @@ runs:
           args+=("--mount-toolchains")
         fi
 
-        rb-sys-dock "${args[@]}" --build
+        if [ -n "$INPUT_PRE_SCRIPT" ]; then
+          rb-sys-dock "${args[@]}" --build -- "$INPUT_PRE_SCRIPT"
+        else
+          rb-sys-dock "${args[@]}" --build
+        fi
 
         exitcode="$?"
         echo "build_exitcode=$exitcode" >> $GITHUB_OUTPUT
