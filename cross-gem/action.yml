@@ -54,7 +54,7 @@ runs:
         echo "rb_sys_version=$rb_sys_version" >> $GITHUB_OUTPUT
 
     - name: Restore cache
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: |
           ${{ env.RB_SYS_DOCK_CACHE_DIR }}
@@ -141,7 +141,7 @@ runs:
         exit "$exitcode"
 
     - name: Save cache
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       if: ${{ (always() && inputs.cache-save-always == 'true') || steps.set-outputs.outputs.build == 0 }}
       with:
         path: |
