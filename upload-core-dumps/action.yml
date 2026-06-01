@@ -8,7 +8,7 @@ inputs:
     default: ""
 outputs: {}
 runs:
-  using: node20
+  using: node24
   main: main.js
   post: post.js
   post-if: always()
