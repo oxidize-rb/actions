@@ -1,7 +1,10 @@
 ---
 name: "CI"
 on:
-  - push
+  push:
+    branches:
+      - main
+  pull_request:
 jobs:
   lint:
     name: Lint
@@ -15,8 +18,7 @@ jobs:
 
           if git diff --exit-code; then
             echo "✅ readmes up to date"
-            git reset --hard HEAD
           else
-            echo "❌ readmes not up to date, run `rake readme` and commit the changes"
+            echo '❌ readmes not up to date, run `rake readme` and commit the changes'
             exit 1
           fi
